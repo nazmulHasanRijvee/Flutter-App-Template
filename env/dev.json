@@ -1,0 +1,4 @@
+{
+    "BASE_URL" : "http://10.10.10.3:5000/api",
+    "COMMUNITY_URL" : "http://api.mercy.kodevio.com"
+}
