@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'dart:math' as math;
 
 import 'package:flutter_app_template/core/static/theme/theme.dart';
@@ -273,7 +273,6 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
 
   @override
   Widget build(BuildContext context) {
-
     final cs = context.colorScheme;
 
     return FadeTransition(
@@ -384,7 +383,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
   }
 
   double _lerpOpacity(double t, double min, double max) =>
-    min + (max - min) * ((math.sin(t * math.pi) + 1) / 2);
+      min + (max - min) * ((math.sin(t * math.pi) + 1) / 2);
 
   /// Inserts [spacing] only between visible children.
   List<Widget> _spaced(List<Widget?> children) {
@@ -453,8 +452,6 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
     dotColor: widget.dotColor ?? cs.onSurface.withValues(alpha: 0.3),
     bounceHeight: widget.dotBounceHeight,
   );
-
-
 }
 
 // ══════════════════════════════════════════════════════════════════

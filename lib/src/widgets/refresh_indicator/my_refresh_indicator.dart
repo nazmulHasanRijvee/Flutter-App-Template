@@ -3,7 +3,7 @@
 import 'dart:math' show cos, sin, pi;
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum RefreshStyle { arc, ripple, orbital, wave }
 
