@@ -1,5 +1,9 @@
 {
-    "editor.fontSize": 14.5,
+    "editor.fontSize": 18,
     "files.autoSave": "afterDelay",
-    "window.zoomLevel": 1.1,
+    "window.zoomLevel": 0,
+    "workbench.colorTheme": "Dark+",
+    "workbench.preferredDarkColorTheme": "Dark+",
+    "workbench.iconTheme": "symbols",
+    "workbench.preferredHighContrastColorTheme": "Dark+",
 }
