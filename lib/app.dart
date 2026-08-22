@@ -23,6 +23,7 @@ class MyApp extends ConsumerWidget {
           debugShowCheckedModeBanner: false,
           theme: context.lightTheme,
           darkTheme: context.darkTheme,
+
           /// ThemeMode.system
           themeMode: themeMode,
           routerConfig: router,
