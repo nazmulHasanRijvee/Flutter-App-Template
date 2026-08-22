@@ -11,7 +11,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final themeMode = ref.watch(themeProvider).value;
+    final themeMode = ref.watch(themeProvider).value ?? ThemeMode.system;
 
     return ScreenUtilInit(
       designSize: const Size(375, 812),
