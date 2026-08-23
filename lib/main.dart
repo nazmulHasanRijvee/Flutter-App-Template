@@ -6,14 +6,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/logger/app_logger.dart';
 import 'data/services/cache/cache_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ScreenUtil.ensureScreenSize();
 
   final prefs = await SharedPreferences.getInstance();
 
