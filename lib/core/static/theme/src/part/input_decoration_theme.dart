@@ -3,7 +3,7 @@ part of '../theme_data.dart';
 class _InputDecorationLightTheme with ThemeExtensions {
   InputDecorationTheme call() {
     final BorderRadius borderRadius = BorderRadius.circular(
-      dimensions.radius.r10,
+      dimensions.radius.md,
     );
 
     return InputDecorationTheme(
@@ -11,22 +11,22 @@ class _InputDecorationLightTheme with ThemeExtensions {
       filled: true,
       fillColor: lightColor.textFieldFillColor,
       contentPadding: EdgeInsets.symmetric(
-        vertical: dimensions.spacing.s12,
-        horizontal: dimensions.spacing.s16,
+        vertical: dimensions.spacing.md,
+        horizontal: dimensions.spacing.lg,
       ),
       border: OutlineInputBorder(borderRadius: borderRadius),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: BorderSide(
           color: lightColor.textFieldBorderColor,
-          width: dimensions.spacing.s2,
+          width: dimensions.spacing.xxs,
         ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: BorderSide(
           color: lightColor.textFieldFocusBorderColor,
-          width: dimensions.spacing.s2,
+          width: dimensions.spacing.xxs,
         ),
       ),
 
@@ -35,7 +35,7 @@ class _InputDecorationLightTheme with ThemeExtensions {
         borderRadius: borderRadius,
         borderSide: BorderSide(
           color: lightColor.border.withValues(alpha: 0.5),
-          width: dimensions.spacing.s2,
+          width: dimensions.spacing.xxs,
         ),
       ),
     );
@@ -45,7 +45,7 @@ class _InputDecorationLightTheme with ThemeExtensions {
 class _InputDecorationDarkTheme with ThemeExtensions {
   InputDecorationTheme call() {
     final BorderRadius borderRadius = BorderRadius.circular(
-      dimensions.radius.r6,
+      dimensions.radius.xs,
     );
 
     return InputDecorationTheme(
@@ -53,15 +53,15 @@ class _InputDecorationDarkTheme with ThemeExtensions {
       filled: true,
       fillColor: darkColor.scaffoldBackground,
       contentPadding: EdgeInsets.symmetric(
-        vertical: dimensions.spacing.s12,
-        horizontal: dimensions.spacing.s16,
+        vertical: dimensions.spacing.md,
+        horizontal: dimensions.spacing.lg,
       ),
       border: OutlineInputBorder(borderRadius: borderRadius),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,
         borderSide: BorderSide(
           color: darkColor.border,
-          width: dimensions.spacing.s1,
+          width: dimensions.spacing.xxs,
         ),
       ),
       suffixIconColor: darkColor.icon,

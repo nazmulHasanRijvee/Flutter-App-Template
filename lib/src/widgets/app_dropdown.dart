@@ -68,7 +68,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
               color: colors.text.primary,
             ),
           ),
-          SizedBox(height: dimensions.spacing.s8),
+          SizedBox(height: dimensions.spacing.sm),
         ],
         FormField<T>(
           initialValue: widget.value,
@@ -110,11 +110,11 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                     buttonStyleData: ButtonStyleData(
                       height: 48,
                       padding: EdgeInsets.symmetric(
-                        horizontal: dimensions.padding.p4,
+                        horizontal: dimensions.spacing.xs,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                          dimensions.radius.r10,
+                          dimensions.radius.md,
                         ),
                         border: Border.all(
                           color: field.hasError ? colors.error : colors.border,
@@ -125,7 +125,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                     dropdownStyleData: DropdownStyleData(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(
-                          dimensions.radius.r10,
+                          dimensions.radius.md,
                         ),
                         color: colors.onPrimary,
                       ),
@@ -133,7 +133,7 @@ class _AppDropdownState<T> extends State<AppDropdown<T>> {
                     ),
                     menuItemStyleData: MenuItemStyleData(
                       padding: EdgeInsets.symmetric(
-                        horizontal: dimensions.padding.p16,
+                        horizontal: dimensions.spacing.lg,
                       ),
                     ),
                   ),

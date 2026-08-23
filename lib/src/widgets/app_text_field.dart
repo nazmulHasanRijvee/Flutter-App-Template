@@ -189,7 +189,7 @@ class _AppTextFieldState extends State<AppTextField>
                   : widget.suffixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(
-                  context.dimensions.padding.p12,
+                  context.dimensions.radius.md,
                 ),
               ),
             ),

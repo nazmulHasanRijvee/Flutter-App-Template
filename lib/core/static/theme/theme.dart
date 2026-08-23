@@ -99,11 +99,8 @@ extension ThemeDataExtension on BuildContext {
   /// Gets the spacing dimensions from the current theme.
   AppSpacing get spacing => dimensions.spacing;
 
-  /// Gets the padding dimensions from the current theme.
-  AppPadding get padding => dimensions.padding;
-
-  /// Gets the margin dimensions from the current theme.
-  AppMargin get margin => dimensions.margin;
+  /// Gets the sizes dimensions from the current theme.
+  AppSizes get sizes => dimensions.sizes;
 
   /// Gets the border radius dimensions from the current theme.
   AppRadius get radius => dimensions.radius;
