@@ -53,7 +53,7 @@ class AppSpacing {
   // large, 16 px
   final double lg = 16;
 
-  /// 20 px
+  /// large 2, 20 px
   final double lg2 = 20;
 
   // extra large, 24 px
