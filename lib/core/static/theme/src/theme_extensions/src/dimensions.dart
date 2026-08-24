@@ -98,7 +98,9 @@ class AppRadius {
   final double pill = 999;
 }
 
-/// Component or widget size design tokens.
+/// Component size design tokens.
+// Example:
+// Icon, IconButton, SizedBox for buttons, CircleAvatar, Container sizes etc.
 class AppSizes {
   const AppSizes();
 
