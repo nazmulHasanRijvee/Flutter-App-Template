@@ -7,7 +7,6 @@ enum CacheKey {
   accessToken,
   refreshToken,
   isOnBoardingCompleted,
-  isLoggedIn,
   rememberMe,
   role,
   language,

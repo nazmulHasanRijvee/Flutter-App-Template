@@ -26,9 +26,6 @@ class $AssetsIconsGen {
   /// File path: assets/icons/chat_outline.svg
   String get chatOutline => 'assets/icons/chat_outline.svg';
 
-  /// File path: assets/icons/devotion.svg
-  String get devotion => 'assets/icons/devotion.svg';
-
   /// File path: assets/icons/google_icon.svg
   String get googleIcon => 'assets/icons/google_icon.svg';
 
@@ -44,26 +41,17 @@ class $AssetsIconsGen {
   /// File path: assets/icons/notification.svg
   String get notification => 'assets/icons/notification.svg';
 
-  /// File path: assets/icons/pray.svg
-  String get pray => 'assets/icons/pray.svg';
-
-  /// File path: assets/icons/prayed.png
-  AssetGenImage get prayed => const AssetGenImage('assets/icons/prayed.png');
-
   /// List of all assets
-  List<dynamic> get values => [
+  List<String> get values => [
     aftarNoon,
     appleIcon,
     chat,
     chatOutline,
-    devotion,
     googleIcon,
     group,
     morning,
     night,
     notification,
-    pray,
-    prayed,
   ];
 }
 
@@ -78,35 +66,8 @@ class $AssetsImagesGen {
   AssetGenImage get appLogo =>
       const AssetGenImage('assets/images/app_logo.png');
 
-  /// File path: assets/images/misty_mountains.png
-  AssetGenImage get mistyMountains =>
-      const AssetGenImage('assets/images/misty_mountains.png');
-
-  /// File path: assets/images/people.png
-  AssetGenImage get people => const AssetGenImage('assets/images/people.png');
-
-  /// File path: assets/images/start_divider.png
-  AssetGenImage get startDivider =>
-      const AssetGenImage('assets/images/start_divider.png');
-
-  /// File path: assets/images/start_image.png
-  AssetGenImage get startImage =>
-      const AssetGenImage('assets/images/start_image.png');
-
-  /// File path: assets/images/verse_frame.png
-  AssetGenImage get verseFrame =>
-      const AssetGenImage('assets/images/verse_frame.png');
-
   /// List of all assets
-  List<AssetGenImage> get values => [
-    appIcon,
-    appLogo,
-    mistyMountains,
-    people,
-    startDivider,
-    startImage,
-    verseFrame,
-  ];
+  List<AssetGenImage> get values => [appIcon, appLogo];
 }
 
 abstract final class Assets {

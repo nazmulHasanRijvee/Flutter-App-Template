@@ -17,9 +17,7 @@ class StartTodayScreen extends StatelessWidget {
       body: Stack(
         alignment: .bottomCenter,
         children: [
-          Assets.images.mistyMountains.image().animate().fadeIn(
-            duration: 700.ms,
-          ),
+          Assets.images.appIcon.image().animate().fadeIn(duration: 700.ms),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -39,7 +37,7 @@ class StartTodayScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Assets.images.startImage
+                    Assets.images.appLogo
                         .image()
                         .animate()
                         .fadeIn(duration: 700.ms)

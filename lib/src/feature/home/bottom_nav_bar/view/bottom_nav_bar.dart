@@ -101,7 +101,7 @@ class _AppBottomNavBarState extends State<AppBottomNavBar> {
               children: [
                 BottomNavBarItem(
                   index: 0,
-                  asset: Assets.icons.devotion,
+                  asset: Assets.icons.appleIcon,
                   label: 'Devotion',
                   isSelected: currentIndex == 0,
                   itemBgColor: itemBgColor,

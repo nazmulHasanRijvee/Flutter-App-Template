@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_app_template/data/services/cache/cache_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ThemeNotifier extends AsyncNotifier<ThemeMode> {
+class ThemeModeNotifier extends AsyncNotifier<ThemeMode> {
   @override
   Future<ThemeMode> build() async {
     return await _loadTheme();
@@ -35,6 +35,6 @@ class ThemeNotifier extends AsyncNotifier<ThemeMode> {
   }
 }
 
-final themeProvider = AsyncNotifierProvider<ThemeNotifier, ThemeMode>(
-  ThemeNotifier.new,
+final themeModeProvider = AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>(
+  ThemeModeNotifier.new,
 );

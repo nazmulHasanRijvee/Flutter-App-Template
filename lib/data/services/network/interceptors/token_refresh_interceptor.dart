@@ -1,27 +1,27 @@
 import 'package:dio/dio.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/route_const.dart';
-import '../../cache/cache_service.dart';
+import '../../auth/auth_service.dart';
 
-class TokenManager extends Interceptor {
-  TokenManager({
+class TokenRefreshInterceptor extends Interceptor {
+  TokenRefreshInterceptor({
     required this.baseUrl,
     required this.refreshTokenEndpoint,
-    required this.cacheService,
+    required this.authService,
     required this.navigatorKey,
     required this.dio,
   });
 
   final String baseUrl;
   final String refreshTokenEndpoint;
-  final CacheService cacheService;
+  final AuthService authService;
   final GlobalKey<NavigatorState> navigatorKey;
   final Dio dio;
 
   /// A bare Dio instance with NO interceptors, used exclusively for
-  /// the token refresh call. This prevents re-entering [TokenManager]
+  /// the token refresh call. This prevents re-entering the interceptor loop
   /// if the refresh endpoint itself returns a 401.
   late final Dio _refreshDio = Dio(
     BaseOptions(
@@ -35,29 +35,16 @@ class TokenManager extends Interceptor {
   final List<_QueuedRequest> _queue = [];
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final accessToken = getAccessToken();
-    if (accessToken != null) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
-    }
-    handler.next(options);
-  }
-
-  @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final statusCode = err.response?.statusCode;
     final options = err.requestOptions;
 
-    if (_shouldHandleError(statusCode, options)) {
+    if (statusCode == 401 && options.extra['retry'] != true) {
       await _handleUnauthorizedError(err, handler);
       return;
     }
 
     handler.next(err);
-  }
-
-  bool _shouldHandleError(int? statusCode, RequestOptions options) {
-    return statusCode == 401 && options.extra['retry'] != true;
   }
 
   Future<void> _handleUnauthorizedError(
@@ -77,6 +64,11 @@ class TokenManager extends Interceptor {
       await _retryQueuedRequests(newToken);
     } catch (e) {
       await _handleRefreshFailure(err, handler);
+      for (final queuedRequest in _queue) {
+        queuedRequest.handler.reject(
+          err,
+        ); // resolve or reject queued requests with the original error
+      }
     } finally {
       _isRefreshing = false;
       _queue.clear();
@@ -84,7 +76,7 @@ class TokenManager extends Interceptor {
   }
 
   Future<String> _refreshAccessToken() async {
-    final refreshToken = getRefreshToken();
+    final refreshToken = getRefreshToken;
     if (refreshToken == null) {
       throw DioException(
         requestOptions: RequestOptions(),
@@ -106,7 +98,7 @@ class TokenManager extends Interceptor {
     }
 
     final newToken = refreshResp.data['data']['accessToken'] as String;
-    await saveToken(CacheKey.accessToken, newToken);
+    await saveToken(newToken);
 
     return newToken;
   }
@@ -147,7 +139,7 @@ class TokenManager extends Interceptor {
   }
 
   Future<void> _removeTokens() async {
-    await cacheService.remove([CacheKey.accessToken, CacheKey.refreshToken]);
+    await authService.clearSession();
   }
 
   void _navigateToLoginScreen() {
@@ -156,14 +148,12 @@ class TokenManager extends Interceptor {
     }
   }
 
-  Future<void> saveToken(CacheKey key, String value) async {
-    await cacheService.save(key, value);
+  Future<void> saveToken(String value) async {
+    await authService.updateAccessToken(value);
   }
 
   // SharedPreferences.get() is synchronous — no async needed.
-  String? getAccessToken() => cacheService.get(CacheKey.accessToken);
-
-  String? getRefreshToken() => cacheService.get(CacheKey.refreshToken);
+  String? get getRefreshToken => authService.refreshToken;
 }
 
 class _QueuedRequest {

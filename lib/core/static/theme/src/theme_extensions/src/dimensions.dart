@@ -76,7 +76,7 @@ class AppSpacing {
 class AppRadius {
   const AppRadius();
 
-   /// extra extra small, 2 px
+  /// extra extra small, 2 px
   final double xxs = 2;
 
   /// extra small, 4 px
@@ -113,13 +113,13 @@ class AppSizes {
   /// medium, 32 px
   final double md = 32;
 
-   /// medium 2, 40 px
+  /// medium 2, 40 px
   final double md2 = 40;
 
   /// large, 48 px
   final double lg = 48;
 
-   /// large 2, 56 px
+  /// large 2, 56 px
   final double lg2 = 56;
 
   /// extra large, 64 px

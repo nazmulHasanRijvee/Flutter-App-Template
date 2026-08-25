@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers/navigator_key_provider.dart'
     show navigatorKeyProvider;
-import '../cache/cache_service.dart';
+import '../auth/auth_service.dart';
 import 'endpoints.dart';
-import 'interceptor/token_manager.dart';
+import 'interceptors/access_token_interceptor.dart';
+import 'interceptors/token_refresh_interceptor.dart';
 
 class DioClient {
   static Dio getInstance(Ref ref) {
@@ -23,14 +24,20 @@ class DioClient {
     );
 
     dio.interceptors.addAll([
-      TokenManager(
+      AccessTokenInterceptor(
+        // onRequest: attach token
+        authService: ref.read(authServiceProvider),
+      ),
+      TokenRefreshInterceptor(
+        // onError: refresh token
         baseUrl: Endpoints.base,
         refreshTokenEndpoint: Endpoints.refreshToken,
-        cacheService: ref.read(cacheServiceProvider),
+        authService: ref.read(authServiceProvider),
         navigatorKey: ref.read(navigatorKeyProvider),
         dio: dio,
       ),
-      if (kDebugMode) LogInterceptor(requestBody: true, responseBody: true),
+      if (kDebugMode)
+        LogInterceptor(requestBody: true, responseBody: true), // always last
     ]);
 
     return dio;
