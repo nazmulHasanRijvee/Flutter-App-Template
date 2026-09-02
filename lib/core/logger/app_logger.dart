@@ -37,11 +37,11 @@ class AppLogger {
     _logger.w(message, error: error, stackTrace: stackTrace);
   }
 
-  static void error(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+  static void error(dynamic message, {dynamic error, StackTrace? stackTrace}) {
     _logger.e(message, error: error, stackTrace: stackTrace);
   }
 
-  static void fatal(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+  static void fatal(dynamic message, {dynamic error, StackTrace? stackTrace}) {
     _logger.f(message, error: error, stackTrace: stackTrace);
   }
 }

@@ -36,7 +36,7 @@ void main() async {
       );
     },
     (error, stackTrace) {
-      AppLogger.fatal('Uncaught zone error: $error', error, stackTrace);
+      AppLogger.fatal('Uncaught zone error: $error', error: error, stackTrace: stackTrace);
     },
   );
 }
