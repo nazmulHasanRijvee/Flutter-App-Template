@@ -13,14 +13,13 @@ class Api {
 
     try {
       result = await action;
-    } catch (err, stackTrace) {
+    } on DioException catch (err, stackTrace) {
       // 1. DioExceptioin occured and Backend returned a JSON map with 'message'
-      if (err is DioException && err.response?.data != null) {
-        final request = err.requestOptions;
-        final response = err.response;
-        final data = request.data;
+      final request = err.requestOptions;
+      final response = err.response;
+      final data = request.data;
 
-        AppLogger.error(
+      AppLogger.error(
           'DioException [${err.type}] ${request.method} ${request.uri}\n'
           'Status Code: ${response?.statusCode}\n'
           'Headers: ${request.headers}\n'
@@ -28,16 +27,28 @@ class Api {
           'Response Body: ${response?.data}',
           error: err,
           stackTrace: stackTrace
-        );
+      );
 
-        if (data is Map<String, dynamic> && data['message'] != null) {
-          await onError(data['message'].toString());
-          return;
+      // Check if the backend returned a JSON map with a 'message' field
+      if(data != null && data is Map<String, dynamic>) {
+        final message = data['message'];
+
+        // if "message" is not null, call onError with the message and stop further processing
+        if (message != null) {
+            await onError(message.toString());
+            return;
         }
       }
 
-      // Provide a more generic fallback or exactly as thrown
-       AppLogger.error('Unexpected Exception', error: err, stackTrace: stackTrace);
+      // If the backend did not return a 'message', use the DioException's message or a generic error message
+      final errorMsg = err.message ?? err.toString();
+      await onError(errorMsg);
+      return;
+
+    } catch (err, stackTrace) {
+      // Generic fallback for unexpected errors like fromJson failures, TypeErors,
+      // Anything Dio didn't wrap
+      AppLogger.error('Unexpected Exception', error: err, stackTrace: stackTrace);
       await onError(err.toString());
       return;
     }
