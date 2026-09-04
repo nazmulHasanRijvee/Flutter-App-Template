@@ -17,7 +17,7 @@ class Api {
       // 1. DioExceptioin occured and Backend returned a JSON map with 'message'
       final request = err.requestOptions;
       final response = err.response;
-      final data = request.data;
+      final data = response?.data;
 
       AppLogger.error(
           'DioException [${err.type}] ${request.method} ${request.uri}\n'
