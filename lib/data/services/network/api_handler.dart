@@ -14,7 +14,7 @@ class Api {
     try {
       result = await action;
     } on DioException catch (err, stackTrace) {
-      // 1. DioExceptioin occured and Backend returned a JSON map with 'message'
+      // 1. DioException occured and Backend returned a JSON map with 'message'
       final request = err.requestOptions;
       final response = err.response;
       final data = response?.data;
