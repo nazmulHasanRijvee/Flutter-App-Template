@@ -36,7 +36,7 @@ class DioClient {
         navigatorKey: ref.read(navigatorKeyProvider),
         dio: dio,
       ),
-      if (kDebugMode)
+      if (kDebugMode) // disable logging only in production (release mode)
         LogInterceptor(requestBody: true, responseBody: true), // always last
     ]);
 

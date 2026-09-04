@@ -14,6 +14,8 @@ class AppLogger {
       printEmojis: true,
       dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
     ),
+    // only allows logging errors in production and disable everything else
+    // there's level.off too for entirely disabling logging in production
     level: kDebugMode ? Level.trace : Level.error,
   );
 
