@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'dio_client.dart';
 import 'endpoints.dart';
 
 part 'rest_client.g.dart';
@@ -19,3 +21,8 @@ abstract class RestClient {
   @POST(Endpoints.forgotPassword)
   Future<HttpResponse> forgotPassword(@Body() Map<String, dynamic> request);
 }
+
+final restClientProvider = Provider<RestClient>((ref) {
+  final dio = ref.watch(dioProvider);
+  return RestClient(dio);
+});

@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter_app_template/core/logger/app_logger.dart';
 import 'package:retrofit/retrofit.dart';
+
+import '../../../core/logger/app_logger.dart';
 
 class Api {
   static Future<void> call<T>({
@@ -20,23 +21,23 @@ class Api {
       final data = response?.data;
 
       AppLogger.error(
-          'DioException [${err.type}] ${request.method} ${request.uri}\n'
-          'Status Code: ${response?.statusCode}\n'
-          'Headers: ${request.headers}\n'
-          'Request Body: ${request.data}\n'
-          'Response Body: ${response?.data}',
-          error: err,
-          stackTrace: stackTrace
+        'DioException [${err.type}] ${request.method} ${request.uri}\n'
+        'Status Code: ${response?.statusCode}\n'
+        'Headers: ${request.headers}\n'
+        'Request Body: ${request.data}\n'
+        'Response Body: ${response?.data}',
+        error: err,
+        stackTrace: stackTrace,
       );
 
       // Check if the backend returned a JSON map with a 'message' field
-      if(data != null && data is Map<String, dynamic>) {
+      if (data != null && data is Map<String, dynamic>) {
         final message = data['message'];
 
         // if "message" is not null, call onError with the message and stop further processing
         if (message != null) {
-            await onError(message.toString());
-            return;
+          await onError(message.toString());
+          return;
         }
       }
 
@@ -44,11 +45,14 @@ class Api {
       final errorMsg = err.message ?? err.toString();
       await onError(errorMsg);
       return;
-
     } catch (err, stackTrace) {
       // Generic fallback for unexpected errors like fromJson failures, TypeErors,
       // Anything Dio didn't wrap
-      AppLogger.error('Unexpected Exception', error: err, stackTrace: stackTrace);
+      AppLogger.error(
+        'Unexpected Exception',
+        error: err,
+        stackTrace: stackTrace,
+      );
       await onError(err.toString());
       return;
     }
