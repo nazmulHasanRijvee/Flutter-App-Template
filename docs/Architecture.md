@@ -1,343 +1,289 @@
 # Architecture Guide
 
-Welcome to the team! This document explains the architecture of the project and how it's organized. This project follows **Clean Architecture** principles to maintain scalability, testability, and maintainability.
+Welcome to the team! This document explains the architecture of the project and how it is organized. This project follows **Clean Architecture** principles structured inside `lib/src/` to ensure high scalability, separation of concerns, testability, and maintainability.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Layered Architecture](#layered-architecture)
-- [Core Layer](#core-layer)
-- [Data Layer](#data-layer)
-- [Domain Layer](#domain-layer)
-- [Presentation Layer (src/)](#presentation-layer-src)
+- [Core Layer (`lib/src/core/`)](#core-layer-libsrccore)
+- [Data Layer (`lib/src/data/`)](#data-layer-libsrcdata)
+- [Domain Layer (`lib/src/domain/`)](#domain-layer-libsrcdomain)
+- [Presentation Layer (`lib/src/presentation/`)](#presentation-layer-libsrcpresentation)
 - [Dependency Flow](#dependency-flow)
 - [Key Principles](#key-principles)
+- [Folder Organization Summary](#folder-organization-summary)
+
+---
 
 ## Overview
 
-The application is structured in **4 layers**, each with specific responsibilities:
+The application is structured into **4 core architectural layers** encapsulated under `lib/src/`, with entry point files `main.dart` and `app.dart` located at the root of `lib/`:
 
 ```
-┌─────────────────────────────────────┐
-│   Presentation Layer (src/)         │
-│   Features, Screens, Widgets        │
-└────────────┬────────────────────────┘
-             │
-┌────────────▼────────────────────────┐
-│   Domain Layer                      │
-│   Business Logic, Entities          │
-└────────────┬────────────────────────┘
-             │
-┌────────────▼────────────────────────┐
-│   Data Layer                        │
-│   Models, Repositories, Services    │
-└────────────┬────────────────────────┘
-             │
-┌────────────▼────────────────────────┐
-│   Core Layer                        │
-│   Shared utilities, Theme, Routing  │
-└─────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                 Presentation Layer                          │
+│               (lib/src/presentation/)                       │
+│   • core/ (providers, routes, theme, widgets)               │
+│   • feature/ (view/, view_model/, widgets/)                 │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────┐
+│                    Domain Layer                             │
+│                  (lib/src/domain/)                          │
+│   • entities/ (immutable business models)                   │
+│   • repositories/ (abstract interface contracts)            │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────┐
+│                     Data Layer                              │
+│                   (lib/src/data/)                           │
+│   • models/ (DTOs, JSON serialization)                      │
+│   • repositories/ (concrete repository implementations)     │
+│   • services/ (network with Dio/Retrofit, cache, auth)      │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+┌──────────────────────────────▼──────────────────────────────┐
+│                     Core Layer                              │
+│                   (lib/src/core/)                           │
+│   • bootstrap.dart, crash reporting, AppLogger,             │
+│   • extensions, constants, utilities, asset gen             │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Layered Architecture
 
 ### Dependency Rule
-- **Higher layers depend on lower layers**
-- **Lower layers never depend on higher layers**
-- **Only depend on abstractions, not concrete implementations**
+- **Higher layers depend on lower layers.**
+- **Lower layers never depend on higher layers.**
+- **The Domain layer is the heart of the business logic** and depends on no external packages or Flutter UI.
+- **Components depend on abstractions** (repository contracts), not concrete implementations.
 
-This ensures loose coupling and makes it easy to test and modify code.
+---
 
-## Core Layer
+## Core Layer (`lib/src/core/`)
 
-Located in: `lib/core/`
+The Core layer contains universal, non-UI infrastructure and utilities utilized throughout the application.
 
-The core layer contains shared utilities and infrastructure used across the entire application.
-
-### Subdirectories:
+### Subdirectories & Key Files:
 
 ```
-core/
-├── const/                    # Application constants
-├── gen/                      # Generated files (from build_runner)
-├── logger/                   # Logging utilities (AppLogger)
-├── providers/                # Riverpod providers (theme, routing)
-├── routes/                   # Routing configuration (Go Router)
-├── static/
-│   ├── extensions/           # Dart extensions for BuildContext
-│   ├── theme/                # Theme system (colors, text styles, dimensions)
-│   └── utils/                # Utility functions
+lib/src/core/
+├── bootstrap.dart                  # App initialization, orientations, system UI, zone guards
+├── initialize_crash_reporting.dart # Telemetry / Crashlytics error reporting
+├── const/                          # App-wide constants (e.g. image paths)
+├── extensions/                     # Dart extensions (BuildContext, String, DateTime)
+├── gen/                            # Asset code generators (flutter_gen output)
+├── localization/                   # Localization delegates and utilities
+├── logger/
+│   ├── app_logger.dart             # Centralized logger (production-safe logging levels)
+│   └── riverpod_log.dart           # RiverpodObserver tracking provider lifecycle
+└── utils/                          # Validators (email), image picker helpers, etc.
 ```
 
 ### Key Components:
+- **`bootstrap()`**: Sets up status bar appearance, locks portrait orientation, initializes crash reporting, and runs the application inside a `runZonedGuarded` to catch unhandled async errors.
+- **`AppLogger`**: Production-aware logging helper that enables trace/debug in development and restricts output to errors in production.
+- **`RiverpodObserver`**: Logs state transitions, additions, and errors across all Riverpod providers.
 
-- **AppLogger**: Centralized logging for debugging and monitoring
-- **ThemeProvider**: Manages light/dark theme state
-- **Go Router**: Client-side routing configuration
-- **ThemeExtensions**: Custom theme classes for styling
+---
 
-## Data Layer
+## Data Layer (`lib/src/data/`)
 
-Located in: `lib/data/`
-
-The data layer handles all data operations including API calls, local storage, and data transformation.
+The Data layer handles all external data sources, network communications, caching, and mapping between remote representations and domain entities.
 
 ### Subdirectories:
 
 ```
-data/
-├── models/                   # Data models (JSON serializable)
-├── repositories/             # Repository implementations (concrete)
+lib/src/data/
+├── models/                         # DTOs with JSON serialization (fromJson/toJson)
+├── repositories/                   # Concrete implementations of domain repository interfaces
 └── services/
-    ├── api/                  # API calls using Dio/Retrofit
-    ├── cache/                # Local storage (SharedPreferences)
-    └── ...                   # Other services
+    ├── auth/                       # AuthService (token storage and auth session)
+    ├── cache/                      # CacheService, SharedPreferencesService, CacheKey
+    └── network/
+        ├── dio_client.dart         # Configured Dio instance + dioProvider
+        ├── rest_client.dart        # Retrofit API client + restClientProvider
+        ├── api_handler.dart        # Api.call<T> standardized response/error wrapper
+        ├── endpoints.dart          # Backend API endpoints
+        └── interceptors/           # AccessTokenInterceptor & TokenRefreshInterceptor
 ```
 
 ### Responsibilities:
 
-- **Models**: Define data structures with JSON serialization
-  ```dart
-  class UserModel {
-    final String id;
-    final String name;
-    
-    factory UserModel.fromJson(Map<String, dynamic> json) => ...
-  }
-  ```
+- **Network Client (`DioClient`)**: Configures Dio with default timeouts, headers, automatic auth token attachment (`AccessTokenInterceptor`), 401 token refresh (`TokenRefreshInterceptor`), and conditional debug logging.
+- **API Handler (`Api.call<T>`)**: Wraps API calls to parse `DioException`, log detailed error context via `AppLogger`, and return clean error messages through an `onError` callback.
+- **Cache Management (`CacheService`)**: Provides type-safe key-value persistence with `CacheKey` enum abstraction over `SharedPreferences`.
+- **Repository Implementations**: Implement domain contracts by coordinating remote services and local caching.
 
-- **Repositories**: Implement data fetching and transformation
-  ```dart
-  class UserRepository {
-    Future<User> getUser(String id) async {
-      final model = await _apiService.getUser(id);
-      return model.toEntity();
-    }
-  }
-  ```
+---
 
-- **Services**: Handle external integrations
-  - API services (Dio, Retrofit)
-  - Cache services (SharedPreferences)
+## Domain Layer (`lib/src/domain/`)
 
-## Domain Layer
-
-Located in: `lib/domain/`
-
-The domain layer contains pure business logic and entities. It's independent of any framework.
+The Domain layer encapsulates pure enterprise and application business rules. It contains no dependencies on Flutter, Dio, or platform APIs.
 
 ### Subdirectories:
 
 ```
-domain/
-└── entities/                 # Business entities (immutable)
+lib/src/domain/
+├── entities/                       # Pure business models (immutable)
+└── repositories/                   # Abstract repository interfaces (contracts)
 ```
 
 ### Key Concepts:
 
-- **Entities**: Represent core business objects
+- **Entities**: Business domain representations without serialization or network baggage.
+- **Repository Contracts**: Abstract interfaces specifying what data operations exist, not how they are executed:
   ```dart
-  class User {
-    final String id;
-    final String name;
-    
-    const User({required this.id, required this.name});
+  abstract interface class AuthenticationRepository {
+    Future<Map<String, dynamic>> login(Map<String, dynamic> data);
+    Future<Map<String, dynamic>> register(Map<String, dynamic> data);
+    Future<void> logout();
   }
   ```
 
-- **Pure Functions**: No side effects, predictable outputs
-- **Independent**: No dependencies on Flutter or external packages
+---
 
-## Presentation Layer (src/)
+## Presentation Layer (`lib/src/presentation/`)
 
-Located in: `lib/src/`
+The Presentation layer contains all UI logic, design tokens, navigation, and screen states. It is partitioned into **Core Presentation** and **Feature Modules**.
 
-The presentation layer handles UI and user interactions.
+### 1. Presentation Core (`lib/src/presentation/core/`)
 
-### Subdirectories:
+Foundational elements shared across all screens:
+- **`providers/`**: Presentation state providers (e.g. `theme_provider.dart` with `ThemeModeNotifier`, `navigator_key_provider.dart`).
+- **`routes/`**: Modular GoRouter architecture:
+  - `routes.dart`: Type-safe `enum Routes` with path definitions.
+  - `route_config.dart`: Central `routerProvider`.
+  - `part_of.dart`: Master orchestrator linking modular route files.
+  - `parts/`: Sub-routes partitioned by flow (`authentication_routes.dart`, `onboarding_routes.dart`, `shell_routes.dart`).
+- **`theme/`**: Design system with `ThemeExtension` (colors, typography, dimensions, component styles) and `BuildContext` accessors (`context.color`, `context.textStyle`, `context.spacing`).
+- **`widgets/`**: Reusable generic widgets (form fields, buttons, custom loaders, empty states, toasts).
 
-```
-src/
-├── feature/                  # Feature modules
-│   ├── home/
-│   ├── profile/
-│   └── ...
-└── widgets/                  # Reusable widgets
-    ├── buttons/
-    ├── cards/
-    └── ...
-```
+### 2. Feature Modules (`lib/src/presentation/feature/`)
 
-### Feature Structure:
-
-Each feature typically follows this pattern:
+Features are modular packages structured by feature domain and screen:
 
 ```
-feature/home/
-├── pages/
-│   └── home_page.dart
-├── widgets/
-│   └── home_widgets.dart
-├── providers/
-│   └── home_provider.dart
-└── models/
-    └── home_models.dart
+feature/[feature_name]/[screen_name]/
+├── view/                           # Screen UI (StatelessWidget or ConsumerWidget)
+├── view_model/                     # Riverpod state notifiers/providers for the screen
+└── widgets/                        # Components specific to this screen
 ```
 
-### Key Principles:
-
-- **One Screen = One Provider**: Each screen has its own state provider
-- **Reusable Widgets**: Common UI components in `widgets/` directory
-- **Separation of Concerns**: Providers handle logic, widgets handle UI
+---
 
 ## Dependency Flow
 
 ```
-HomeScreen (Presentation)
+Screen Widget (lib/src/presentation/feature/.../view/)
         │
-        ├── uses ──→ homeProvider (Provider)
-        │              │
-        │              ├── uses ──→ UserRepository
-        │              │              │
-        │              │              ├── uses ──→ UserApiService (Data)
-        │              │              │              │
-        │              │              │              └── API calls
-        │              │              │
-        │              │              └── converts ──→ User (Domain Entity)
-        │              │
-        │              └── returns ──→ AsyncValue<User>
+        ├── watches ──→ ViewModel Provider (lib/src/presentation/feature/.../view_model/)
+        │                     │
+        │                     ├── uses ──→ Domain Repository Interface (lib/src/domain/repositories/)
+        │                     │                   ▲
+        │                     │                   │ implemented by
+        │                     │            Data Repository Impl (lib/src/data/repositories/)
+        │                     │                   │
+        │                     │                   ├── calls ──→ RestClient / DioClient (Data Services)
+        │                     │                   │                   │
+        │                     │                   │                   └── wraps with Api.call<T>
+        │                     │                   │
+        │                     │                   └── maps to ──→ Domain Entity (lib/src/domain/entities/)
+        │                     │
+        │                     └── updates ──→ AsyncValue / Notifier State
         │
-        └── accesses ──→ context.color, context.textStyle (Theme)
+        └── styles with ──→ context.color, context.textStyle (Presentation Core Theme)
 ```
 
-### Example: Fetching User Data
+### Complete End-to-End Example
 
 ```dart
-// 1. Domain Layer (Pure Business Logic)
-class User {
-  final String id;
-  final String name;
-  const User({required this.id, required this.name});
+// 1. Domain Layer: Contract
+// lib/src/domain/repositories/auth_repository.dart
+abstract interface class AuthenticationRepository {
+  Future<Map<String, dynamic>> login(Map<String, dynamic> data);
 }
 
-// 2. Data Layer (API Integration)
-class UserModel {
-  final String id;
-  final String name;
-  
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id'],
-    name: json['name'],
-  );
-  
-  User toEntity() => User(id: id, name: name);
-}
+// 2. Data Layer: Implementation
+// lib/src/data/repositories/auth_repository_impl.dart
+class AuthenticationRepositoryImpl implements AuthenticationRepository {
+  AuthenticationRepositoryImpl({required this.remote, required this.authService});
 
-// 3. Data Layer (Repository)
-class UserRepository {
-  Future<User> getUser(String id) async {
-    final model = await _apiService.getUser(id);
-    return model.toEntity();
+  final RestClient remote;
+  final AuthService authService;
+
+  @override
+  Future<Map<String, dynamic>> login(Map<String, dynamic> data) async {
+    final response = await remote.login(data);
+    return response.data as Map<String, dynamic>;
   }
 }
 
-// 4. Presentation Layer (Provider)
-final userProvider = FutureProvider<User>((ref) async {
-  final repository = ref.watch(userRepositoryProvider);
-  return repository.getUser('user_id');
-});
+// 3. Presentation Layer: ViewModel
+// lib/src/presentation/feature/auth/sign_in_screen/view_model/sign_in_provider.dart
+final signInProvider = AsyncNotifierProvider<SignInNotifier, void>(SignInNotifier.new);
 
-// 5. Presentation Layer (Widget)
-class UserScreen extends ConsumerWidget {
+class SignInNotifier extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {}
+
+  Future<void> login(String email, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(authRepositoryProvider);
+      await repo.login({'email': email, 'password': password});
+    });
+  }
+}
+
+// 4. Presentation Layer: View
+// lib/src/presentation/feature/auth/sign_in_screen/view/sign_in_screen.dart
+class SignInScreen extends ConsumerWidget {
+  const SignInScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(userProvider);
-    
-    return userAsync.when(
-      data: (user) => Text(user.name),
-      loading: () => CircularProgressIndicator(),
-      error: (err, stack) => Text('Error: $err'),
+    final state = ref.watch(signInProvider);
+
+    return Scaffold(
+      body: state.isLoading
+          ? const CustomLoadingIndicator()
+          : Center(
+              child: ElevatedButton(
+                onPressed: () => ref.read(signInProvider.notifier).login('user@test.com', '123456'),
+                child: const Text('Sign In'),
+              ),
+            ),
     );
   }
 }
 ```
 
+---
+
 ## Key Principles
 
-### 1. Single Responsibility
-Each class should have one reason to change:
-- Models format data
-- Repositories fetch data
-- Entities represent business logic
-- Widgets display UI
+1. **Scalable Modular Organization**: Moving everything under `lib/src/` enforces clean encapsulation, while partitioning presentation into `core/` and `feature/` prevents circular dependencies and bloated folders.
+2. **Robust Error Handling**: The combination of `bootstrap()` with `runZonedGuarded`, `AppLogger`, and `Api.call<T>` guarantees that uncaught exceptions and network failures are captured with detailed context without crashing the app.
+3. **Type-Safe Navigation**: `enum Routes` paired with partitioned route parts eliminates hardcoded string URLs, makes route lists manageable, and guarantees compile-time route verification.
+4. **Separation of Presentation Concerns**: `view/` handles layout, `view_model/` handles state and business coordination, and `widgets/` isolates localized components.
 
-### 2. Separation of Concerns
-- **UI Logic** ≠ **Business Logic** ≠ **Data Access Logic**
-- Use Riverpod providers to bridge these concerns
-
-### 3. DRY (Don't Repeat Yourself)
-- Extract common logic into utilities or base classes
-- Reuse widgets and providers
-
-### 4. SOLID Principles
-- **S**ingle Responsibility: One class, one job
-- **O**pen/Closed: Open for extension, closed for modification
-- **L**iskov Substitution: Subtypes should be substitutable
-- **I**nterface Segregation: Specific interfaces over general ones
-- **D**ependency Inversion: Depend on abstractions, not implementations
-
-### 5. Testability
-- Pure functions are easy to test
-- Mock repositories for widget tests
-- Use providers for dependency injection
-
-## Best Practices
-
-### ✅ DO:
-- Keep entities and domain logic framework-agnostic
-- Use repositories as the single source of data
-- Organize features by domain, not by type
-- Use type-safe models with proper serialization
-- Handle errors gracefully with AsyncValue
-
-### ❌ DON'T:
-- Mix UI logic with business logic
-- Access data services directly from widgets
-- Create god classes with too many responsibilities
-- Use global state when Riverpod providers work better
-- Ignore null safety and type safety
+---
 
 ## Folder Organization Summary
 
 ```
 lib/
-├── main.dart                 # Entry point
-├── app.dart                  # App configuration
-├── core/                     # Shared layer
-│   ├── const/
-│   ├── gen/
-│   ├── logger/
-│   ├── providers/
-│   ├── routes/
-│   └── static/
-├── data/                     # Data layer
-│   ├── models/
-│   ├── repositories/
-│   └── services/
-├── domain/                   # Domain layer
-│   └── entities/
-└── src/                      # Presentation layer
-    ├── feature/
-    └── widgets/
+├── main.dart                       # App entry with SharedPreferences override & bootstrap
+├── app.dart                        # Root MaterialApp with ScreenUtil & theme binding
+└── src/
+    ├── core/                       # App-wide infrastructure, bootstrap, logger, utils
+    ├── data/                       # Models, repositories, network, cache, auth services
+    ├── domain/                     # Entities and repository interfaces
+    └── presentation/               # Presentation layer
+        ├── core/                   # Shared providers, modular routes, theme, shared widgets
+        └── feature/                # Feature packages organized by screen (view, view_model, widgets)
 ```
-
-## Getting Help
-
-- 📚 Read the [Flutter Documentation](https://flutter.dev/docs)
-- 🏗️ Learn about [Clean Architecture](https://resocoder.com/clean-architecture)
-- 📦 Check [Riverpod Documentation](https://riverpod.dev)
-- 🎨 See [Theme Guide](./Theme.md)
-
----
-
-**Remember**: The goal of this architecture is to make the codebase scalable, testable, and maintainable. Always think about dependencies and responsibilities when organizing code.

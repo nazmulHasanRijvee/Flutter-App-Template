@@ -6,9 +6,11 @@ Get up and running with the project in just a few minutes!
 
 Before starting, make sure you have:
 - ✅ Flutter SDK installed ([Download](https://flutter.dev/docs/get-started/install))
-- ✅ Dart SDK (comes with Flutter)
+- ✅ Dart SDK (bundled with Flutter)
 - ✅ An IDE (VS Code or Android Studio)
-- ✅ A device or emulator
+- ✅ A device, emulator, or simulator
+
+---
 
 ## First-Time Setup
 
@@ -18,12 +20,12 @@ Before starting, make sure you have:
 flutter pub get
 ```
 
-### Step 2: Generate Files (if needed)
+### Step 2: Generate Files
 
-If the project has generated files:
+Run `build_runner` to generate Retrofit clients, JSON serializable models, and asset files:
 
 ```bash
-flutter pub run build_runner build
+flutter pub run build_runner build --delete-conflicting-outputs
 ```
 
 ### Step 3: Run the App
@@ -34,6 +36,8 @@ flutter run
 
 Your app should now be running! 🎉
 
+---
+
 ## Common Commands
 
 ### Development
@@ -42,16 +46,16 @@ Your app should now be running! 🎉
 # Run app in debug mode
 flutter run
 
-# Run app in release mode (faster)
+# Run app in release mode (faster performance)
 flutter run --release
 
-# Run on specific device
+# Run on specific target device
 flutter run -d <device_id>
 
-# Run with verbose output (debugging)
+# Run with verbose output for debugging
 flutter run --verbose
 
-# List available devices
+# List available connected devices
 flutter devices
 ```
 
@@ -61,7 +65,7 @@ flutter devices
 # Run all tests
 flutter test
 
-# Run tests with coverage
+# Run tests with coverage report
 flutter test --coverage
 
 # Run specific test file
@@ -80,88 +84,104 @@ flutter build appbundle
 # Build iOS app
 flutter build ios
 
-# Build web
+# Build web application
 flutter build web
 ```
 
 ### Code Quality
 
 ```bash
-# Format code
+# Format code across the project
 dart format lib/
 
-# Analyze code
+# Analyze code for warnings and errors
 dart analyze
 
-# Fix issues automatically
+# Apply automatic lint fixes
 dart fix --apply
 ```
+
+---
 
 ## Project Structure Quick Reference
 
 ```
 lib/
-├── main.dart          ← Entry point
-├── app.dart           ← Root widget
-├── core/              ← Shared utilities
-├── data/              ← API & Database
-├── domain/            ← Business logic
-└── src/               ← UI & Features
+├── main.dart                             ← Entry point (bootstrap & DI setup)
+├── app.dart                              ← Root widget (ScreenUtil & router binding)
+└── src/                                  ← Encapsulated application implementation
+    ├── core/                             ← App-wide utilities, bootstrap & logging
+    ├── data/                             ← API clients, cache & repository implementations
+    ├── domain/                           ← Pure entities & repository contracts
+    └── presentation/                     ← UI layer
+        ├── core/                         ← Shared providers, routes, theme & widgets
+        └── feature/                      ← Feature screens (view, view_model, widgets)
 ```
 
 **Detailed guide**: See [ProjectStructure.md](./ProjectStructure.md)
+
+---
 
 ## Key Files to Know
 
 | File | Purpose |
 |------|---------|
-| `lib/main.dart` | Application entry point |
-| `lib/app.dart` | Root widget configuration |
-| `lib/core/routes/route_config.dart` | Route definitions |
-| `lib/core/static/theme/` | Theme system |
-| `pubspec.yaml` | Dependencies |
-| `analysis_options.yaml` | Lint rules |
+| `lib/main.dart` | Application entry point with SharedPreferences DI |
+| `lib/src/core/bootstrap.dart` | App initialization, orientation locking, uncaught error zones |
+| `lib/app.dart` | Root widget configuring ScreenUtil, themes, and GoRouter |
+| `lib/src/presentation/core/routes/routes.dart` | Type-safe `enum Routes` defining paths and names |
+| `lib/src/presentation/core/routes/route_config.dart` | Main GoRouter configuration assembling modular sub-routes |
+| `lib/src/presentation/core/theme/` | Central design system (colors, typography, dimensions) |
+| `lib/src/data/services/network/dio_client.dart` | Dio client configuration with auth & refresh interceptors |
+| `pubspec.yaml` | App dependencies and metadata |
+| `analysis_options.yaml` | Linting rules and analyzer configurations |
+
+---
 
 ## Understanding the Architecture
 
-This project follows **Clean Architecture** with 4 layers:
+This project follows **Clean Architecture** with 4 distinct layers:
 
 ```
-Presentation (UI)
+Presentation (lib/src/presentation/)
         ↓
-     Domain (Business Logic)
+Domain (lib/src/domain/)
         ↓
-     Data (API/Database)
+Data (lib/src/data/)
         ↓
-     Core (Shared Utilities)
+Core (lib/src/core/)
 ```
 
 **Learn more**: See [Architecture.md](./Architecture.md)
 
+---
+
 ## State Management with Riverpod
 
-The app uses **Riverpod** for state management:
+The app uses **Riverpod** for reactive state management and dependency injection:
 
 ```dart
-// Watch a provider for changes
+// Watch a provider inside a ConsumerWidget
 final userData = ref.watch(userProvider);
 
-// Read a provider once
-ref.read(userProvider);
+// Read a provider once inside a callback or method
+ref.read(userProvider.notifier).updateName('Jane');
 
-// Execute async operations
+// Render async operations gracefully
 userAsync.when(
   data: (user) => Text(user.name),
-  loading: () => CircularProgressIndicator(),
+  loading: () => const CustomLoadingIndicator(),
   error: (err, st) => Text('Error: $err'),
-)
+);
 ```
 
 **Deep dive**: See [StateManagement.md](./StateManagement.md)
 
+---
+
 ## Theme System
 
-Access theme values easily:
+Access design tokens directly through `BuildContext` extensions:
 
 ```dart
 // Colors
@@ -169,7 +189,7 @@ context.color.primary
 context.color.error
 context.color.surface
 
-// Text Styles
+// Typography
 context.textStyle.headingLarge
 context.textStyle.bodyMedium
 context.textStyle.labelSmall
@@ -182,140 +202,111 @@ context.radius.r8
 
 **Learn more**: See [Theme.md](./Theme.md)
 
+---
+
 ## Adding a New Feature
 
 ### 1. Create Feature Directory
 
 ```bash
-mkdir -p lib/src/feature/my_feature/{pages,widgets,providers,models}
+mkdir -p lib/src/presentation/feature/my_feature/my_feature_screen/{view,view_model,widgets}
 ```
 
-### 2. Create Main Page
+### 2. Create the Screen Widget
 
 ```dart
-// lib/src/feature/my_feature/pages/my_feature_page.dart
+// lib/src/presentation/feature/my_feature/my_feature_screen/view/my_feature_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MyFeaturePage extends StatelessWidget {
-  const MyFeaturePage({super.key});
+class MyFeatureScreen extends ConsumerWidget {
+  const MyFeatureScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('My Feature')),
-      body: const Center(child: Text('Hello')),
+      body: const Center(child: Text('Hello from My Feature!')),
     );
   }
 }
 ```
 
-### 3. Add Route
+### 3. Register Route in `routes.dart`
 
 ```dart
-// In lib/core/routes/route_config.dart
+// lib/src/presentation/core/routes/routes.dart
+enum Routes {
+  // ...
+  myFeature('/my_feature');
+
+  const Routes(this.path);
+  final String path;
+}
+```
+
+### 4. Add Route Definition to a Route Part
+
+```dart
+// lib/src/presentation/core/routes/parts/shell_routes.dart (or custom part file)
 GoRoute(
-  path: '/my-feature',
-  name: 'myFeature',
-  builder: (context, state) => const MyFeaturePage(),
+  path: Routes.myFeature.path,
+  name: Routes.myFeature.name,
+  pageBuilder: (context, state) => const MaterialPage(child: MyFeatureScreen()),
 ),
 ```
 
-### 4. Navigate
+### 5. Navigate
 
 ```dart
-context.pushNamed('myFeature');
+context.pushNamed(Routes.myFeature.name);
 ```
+
+---
 
 ## Debugging Tips
 
-### Enable Hot Reload
-
-Press `r` in terminal during `flutter run` to reload code changes instantly.
+### Hot Reload & Hot Restart
+- Press `r` in the terminal for hot reload.
+- Press `R` in the terminal for hot restart.
 
 ### View Logs
-
+App logs are formatted cleanly via `AppLogger`:
 ```bash
-# Filter by tag
-flutter logs | grep MyTag
-
-# Real-time logs
-flutter logs --follow
+flutter logs
 ```
 
-### Use DevTools
-
+### Use Flutter DevTools
 ```bash
-# Open DevTools UI in browser
 flutter pub global run devtools
-
-# Or automatic launch
-flutter run --devtools-server-address localhost:9100
 ```
 
-### Common Issues
-
-**Issue**: App won't start
-
-**Solution**:
-```bash
-flutter clean
-flutter pub get
-flutter run
-```
-
-**Issue**: Hot reload not working
-
-**Solution**:
-```bash
-flutter run --no-fast-start
-```
-
-**Issue**: Port already in use
-
-**Solution**:
-```bash
-flutter run -d android-device --verbose
-```
+---
 
 ## File Locations Guide
 
 | Need | Path |
 |------|------|
-| Add a screen | `lib/src/feature/[feature]/pages/` |
-| Add state logic | `lib/src/feature/[feature]/providers/` |
-| Add reusable widget | `lib/src/widgets/` |
-| Fetch data from API | `lib/data/services/api/` |
-| Store local data | `lib/data/services/cache/` |
-| Business logic | `lib/domain/entities/` |
-| Colors/Fonts | `lib/core/static/theme/` |
-| Global state | `lib/core/providers/` |
-
-## Next Steps
-
-1. 📚 **Read the Architecture Guide** - Understand how the code is organized
-2. 🎨 **Learn the Theme System** - Customize colors and fonts
-3. 🔄 **Master Riverpod** - State management patterns
-4. 📝 **Check Conventions** - Coding standards
-5. 🔌 **Integrate APIs** - Add backend connectivity
-
-## Need Help?
-
-- 📖 [Architecture Guide](./Architecture.md) - Project structure & design
-- 🎨 [Theme Guide](./Theme.md) - Styling system
-- 🔄 [State Management](./StateManagement.md) - Riverpod patterns
-- 📂 [Project Structure](./ProjectStructure.md) - File organization
-- ✅ [Conventions](./Conventions.md) - Coding standards
-
-**External Resources**:
-- [Flutter Documentation](https://flutter.dev/docs)
-- [Dart Language Tour](https://dart.dev/guides/language/language-tour)
-- [Riverpod Docs](https://riverpod.dev)
-- [Go Router Docs](https://pub.dev/packages/go_router)
-
-## Welcome to the Team! 👋
-
-You're all set! Start by exploring the project structure and running the app. Happy coding!
+| App Bootstrap / Initialization | `lib/src/core/bootstrap.dart` |
+| Add a screen | `lib/src/presentation/feature/[feature]/[screen]/view/` |
+| Add screen state logic | `lib/src/presentation/feature/[feature]/[screen]/view_model/` |
+| Add screen-specific widget | `lib/src/presentation/feature/[feature]/[screen]/widgets/` |
+| Add shared UI widget | `lib/src/presentation/core/widgets/` |
+| Fetch data from API | `lib/src/data/services/network/` |
+| Store local data / cache | `lib/src/data/services/cache/` |
+| Business domain entities | `lib/src/domain/entities/` |
+| Repository contracts | `lib/src/domain/repositories/` |
+| Repository implementations | `lib/src/data/repositories/` |
+| Colors / Typography / Spacing | `lib/src/presentation/core/theme/` |
+| Global UI state (Theme / Nav) | `lib/src/presentation/core/providers/` |
+| Route setup | `lib/src/presentation/core/routes/` |
 
 ---
 
-**Pro Tip**: Bookmark this guide and the others for quick reference while developing.
+## Next Steps
+
+1. 📚 **[Architecture Guide](./Architecture.md)** - Understand the Clean Architecture layout
+2. 🎨 **[Theme Guide](./Theme.md)** - Learn how styling, colors, and fonts work
+3. 🔄 **[State Management](./StateManagement.md)** - Master Riverpod patterns
+4. 🔌 **[API Integration](./ApiIntegration.md)** - Connect to backends using Dio and Retrofit
+5. 📝 **[Conventions](./Conventions.md)** - Explore code style guidelines

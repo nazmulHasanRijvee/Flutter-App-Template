@@ -87,27 +87,29 @@ flutter build web --release
 
 ```
 lib/
-├── main.dart                 # Application entry point
-├── app.dart                  # Root widget
+├── main.dart                 # Application entry point with bootstrap & DI
+├── app.dart                  # Root widget configuring ScreenUtil & router
 │
-├── core/                     # Shared layer (utilities, constants, routes)
-│   ├── const/                # Application constants
-│   ├── logger/               # Logging utilities
-│   ├── providers/            # Global Riverpod providers
-│   ├── routes/               # Navigation and routing
-│   └── static/               # Extensions, theme, utils
-│
-├── data/                     # Data layer (API, repositories)
-│   ├── models/               # API response models
-│   ├── repositories/         # Repository implementations
-│   └── services/             # API clients and services
-│
-├── domain/                   # Domain layer (entities, interfaces)
-│   └── entities/             # Business logic entities
-│
-└── src/
-    ├── features/             # Feature-specific code
-    └── widgets/              # Reusable UI components
+└── src/                      # Internal implementation
+    ├── core/                 # Shared infrastructure, bootstrap, crash reporting, logger
+    │   ├── bootstrap.dart
+    │   ├── initialize_crash_reporting.dart
+    │   ├── logger/
+    │   ├── extensions/
+    │   └── utils/
+    │
+    ├── data/                 # Data layer (network, cache, repositories)
+    │   ├── models/           # DTO response models
+    │   ├── repositories/     # Repository implementations
+    │   └── services/         # Network (Dio/Retrofit/Api.call), cache, auth
+    │
+    ├── domain/               # Domain layer (business logic)
+    │   ├── entities/         # Business logic entities
+    │   └── repositories/     # Repository contracts
+    │
+    └── presentation/         # Presentation layer (UI & UX)
+        ├── core/             # Shared providers, modular routes, theme, widgets
+        └── feature/          # Feature packages (view, view_model, widgets)
 ```
 
 See [docs/ProjectStructure.md](docs/ProjectStructure.md) for detailed documentation.
@@ -142,15 +144,15 @@ Complete documentation is available in the `docs/` directory:
 ## 🎨 Customization
 
 ### Add a New Feature
-1. Create feature folder under `lib/src/features/`
-2. Add domain, data, and presentation layers
-3. Register providers in Riverpod
-4. Add routes to Go Router configuration
+1. Define entity & repository interface in `lib/src/domain/`
+2. Implement model & repository in `lib/src/data/`
+3. Build UI module under `lib/src/presentation/feature/[feature]/[screen]/` (`view/`, `view_model/`, `widgets/`)
+4. Register route in `lib/src/presentation/core/routes/routes.dart` and route parts
 
 See [docs/ProjectStructure.md](docs/ProjectStructure.md) for detailed instructions.
 
 ### Modify Theme
-Edit `lib/core/static/theme/` to customize:
+Edit `lib/src/presentation/core/theme/` to customize:
 - Colors
 - Typography
 - Spacing and dimensions

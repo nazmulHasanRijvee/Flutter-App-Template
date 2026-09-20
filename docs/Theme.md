@@ -344,7 +344,7 @@ class UserCard extends StatelessWidget {
 
 ### Step 1: Define Your Colors
 
-Edit `lib/core/static/theme/src/theme_extensions/src/colors/colors.dart`:
+Edit `lib/src/presentation/core/theme/src/theme_extensions/src/colors/colors.dart`:
 
 ```dart
 class LightColorExtension extends ColorExtension {
@@ -368,7 +368,7 @@ class DarkColorExtension extends ColorExtension {
 
 ### Step 2: Define Your Text Styles
 
-Edit `lib/core/static/theme/src/theme_extensions/src/text_style.dart`:
+Edit `lib/src/presentation/core/theme/src/theme_extensions/src/text_style.dart`:
 
 ```dart
 class TextStyleExtension extends ThemeExtension<TextStyleExtension> {
@@ -387,7 +387,7 @@ class TextStyleExtension extends ThemeExtension<TextStyleExtension> {
 
 ### Step 3: Add Dimensions
 
-Edit `lib/core/static/theme/src/theme_extensions/src/dimensions.dart`:
+Edit `lib/src/presentation/core/theme/src/theme_extensions/src/dimensions.dart`:
 
 ```dart
 class Dimensions extends ThemeExtension<Dimensions> {
@@ -622,14 +622,14 @@ class ResponsiveCard extends StatelessWidget {
 
 ## Theme Persistence
 
-The theme preference is saved to the device and restored on app launch:
+The theme preference is saved to the device and restored on app launch via `CacheService`:
 
 ```dart
-// Changing theme (saved automatically)
-ref.read(themeProvider.notifier).changeTheme(ThemeMode.dark);
+// Changing theme (saved automatically via CacheService using CacheKey.themeMode)
+ref.read(themeModeProvider.notifier).changeTheme(ThemeMode.dark);
 
-// Theme is persisted via SharedPreferences
-// On app restart, the saved theme will be restored
+// Theme is persisted via SharedPreferences using cacheServiceProvider
+// On app restart, the saved theme mode will be restored
 ```
 
 ## Troubleshooting
@@ -638,7 +638,7 @@ ref.read(themeProvider.notifier).changeTheme(ThemeMode.dark);
 
 **Cause**: The theme extension is not registered in `ThemeData`.
 
-**Solution**: Check `lib/core/static/theme/src/theme_data.dart` and ensure extensions are added:
+**Solution**: Check `lib/src/presentation/core/theme/src/theme_data.dart` and ensure extensions are added:
 ```dart
 ThemeData(
   extensions: <ThemeExtension<dynamic>>[
@@ -653,12 +653,14 @@ ThemeData(
 
 **Cause**: Widget is not rebuilding when theme changes.
 
-**Solution**: Use `ConsumerWidget` if using Riverpod:
+**Solution**: Use `ConsumerWidget` and watch `themeModeProvider` or access theme extensions via `context`:
 ```dart
 class MyWidget extends ConsumerWidget {
+  const MyWidget({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(themeProvider);  // Watch theme changes
+    ref.watch(themeModeProvider);  // Watch theme changes if needed
     return Container(
       color: context.color.primary,
     );

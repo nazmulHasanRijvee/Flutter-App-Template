@@ -320,12 +320,47 @@ class UserRepository {
   Future<User> createUser(User user) async { /* ... */ }
   Future<User> updateUser(User user) async { /* ... */ }
   
-  // Delete operations
-  Future<void> deleteUser(String id) async { /* ... */ }
-  
-  // Helper methods
-  User _parseResponse(Map<String, dynamic> json) => User.fromJson(json);
-}
+```
+
+### Feature Module Layout
+
+Each feature screen must be isolated into a 3-folder structure:
+
+```
+feature/[feature_name]/[screen_name]/
+├── view/            # Screen widgets (e.g. sign_in_screen.dart)
+├── view_model/      # Riverpod providers/notifiers (e.g. sign_in_provider.dart)
+└── widgets/         # Screen-specific components (e.g. social_button.dart)
+```
+
+- **`view/`**: Contains the main screen UI (`ConsumerWidget` or `StatelessWidget`).
+- **`view_model/`**: Contains the state logic (`Notifier`, `AsyncNotifier`, or `FutureProvider`).
+- **`widgets/`**: Contains sub-widgets created solely for this screen to prevent massive single files.
+- Shared widgets across multiple features belong in `lib/src/presentation/core/widgets/`.
+
+### Modular Routing Conventions
+
+- Declare all named routes in `enum Routes` (`lib/src/presentation/core/routes/routes.dart`).
+- Break down route configurations into domain-specific part files inside `lib/src/presentation/core/routes/parts/` using `part of '../part_of.dart';`.
+- Navigate using named routes from the enum:
+  ```dart
+  // ✅ Type-safe navigation
+  context.pushNamed(Routes.homeScreen.name);
+  ```
+
+### Centralized Logging
+
+Always use `AppLogger` instead of `print()` or `debugPrint()`:
+
+```dart
+// ✅ Structured, production-filtered logging
+AppLogger.debug('User profile loaded: ${user.id}');
+AppLogger.info('App bootstrap finished');
+AppLogger.warning('Cache miss for key: $key');
+AppLogger.error('Failed to submit form', error: e, stackTrace: st);
+
+// ❌ Avoid raw print
+print('Something happened');
 ```
 
 ## Error Handling

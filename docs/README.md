@@ -138,7 +138,7 @@ Welcome to the project documentation! This directory contains comprehensive guid
 ### Adding a New Screen
 
 1. Read: [Project Structure - Adding a New Feature](./ProjectStructure.md#example-adding-a-new-feature)
-2. Reference: [Architecture - Presentation Layer](./Architecture.md#presentation-layer-src)
+2. Reference: [Architecture - Presentation Layer](./Architecture.md#presentation-layer-libsrcpresentation)
 3. State: [State Management - Provider Types](./StateManagement.md#provider-types)
 4. Style: [Theme System - How to Use](./Theme.md#how-to-use)
 5. Code: [Conventions - Widget Best Practices](./Conventions.md#widget-best-practices)
@@ -146,15 +146,15 @@ Welcome to the project documentation! This directory contains comprehensive guid
 ### Connecting to an API
 
 1. Read: [API Integration - Overview](./ApiIntegration.md#overview)
-2. Setup: [API Integration - Setting Up Services](./ApiIntegration.md#setting-up-services)
-3. Integrate: [API Integration - Making Requests](./ApiIntegration.md#making-requests)
-4. Handle Errors: [API Integration - Error Handling](./ApiIntegration.md#error-handling)
+2. Setup: [API Integration - Setting Up Network Services](./ApiIntegration.md#setting-up-network-services)
+3. Integrate: [API Integration - REST Client with Retrofit](./ApiIntegration.md#rest-client-with-retrofit)
+4. Handle Errors: [API Integration - Standardized API Calls](./ApiIntegration.md#standardized-api-calls-apicall)
 5. Test: [Conventions - Testing](./Conventions.md#testing)
 
 ### Fixing a Bug
 
 1. Read: [Getting Started - Debugging Tips](./GettingStarted.md#debugging-tips)
-2. Locate: [Project Structure - Quick Reference](./ProjectStructure.md#quick-reference)
+2. Locate: [Project Structure - Quick Reference](./ProjectStructure.md#quick-reference-table)
 3. Understand: [Architecture - Dependency Flow](./Architecture.md#dependency-flow)
 4. Fix: [Conventions - Best Practices](./Conventions.md)
 5. Test: [Conventions - Testing](./Conventions.md#testing)
@@ -164,11 +164,11 @@ Welcome to the project documentation! This directory contains comprehensive guid
 ## 💡 Key Concepts
 
 ### Clean Architecture
-The project uses **4-layer architecture**:
-- **Core**: Shared utilities, theme, routing
-- **Data**: API, database, models, repositories
-- **Domain**: Business logic, entities
-- **Presentation**: UI, screens, features
+The project uses **4-layer architecture** encapsulated under `lib/src/`:
+- **Core (`lib/src/core/`)**: App-wide infrastructure, bootstrap, logging, utilities
+- **Data (`lib/src/data/`)**: API clients (Dio, Retrofit), caching, models, repositories
+- **Domain (`lib/src/domain/`)**: Pure business logic, entities, repository contracts
+- **Presentation (`lib/src/presentation/`)**: UI split into `core/` (providers, routes, theme, widgets) and `feature/` (view, view_model, widgets)
 
 [Learn more →](./Architecture.md)
 
@@ -197,7 +197,7 @@ Abstraction layer for data access:
 - Entities represent business data
 - Providers use repositories for state
 
-[Learn more →](./ApiIntegration.md#architecture)
+[Learn more →](./ApiIntegration.md#architecture--data-flow)
 
 ---
 

@@ -47,23 +47,32 @@ final myProvider = Provider<String>((ref) => 'Hello');
 // Use in widget
 final value = ref.read(myProvider);        // Read once
 final stream = ref.watch(myProvider);      // Watch for changes
-```
+### 2. ProviderScope & App Bootstrap
 
-### 2. ProviderScope
-
-All Riverpod apps must wrap their root widget with `ProviderScope`:
+All Riverpod apps wrap their root widget with `ProviderScope`. In this project, `ProviderScope` is configured inside `main.dart` within the `bootstrap()` lifecycle:
 
 ```dart
-void main() {
-  runApp(
-    ProviderScope(
-      child: MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+
+  await bootstrap(() {
+    runApp(
+      ProviderScope(
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+        observers: [RiverpodObserver()],
+        child: const MyApp(),
+      ),
+    );
+  });
 }
 ```
 
-This sets up the state management system.
+This setup:
+- Overrides `sharedPreferencesProvider` synchronously so services can inject `SharedPreferences` without waiting.
+- Attaches `RiverpodObserver` (from `lib/src/core/logger/riverpod_log.dart`) to log provider lifecycle transitions in debug mode.
+- Executes `bootstrap()` to manage system orientations, UI overlays, and crash reporting.
 
 ### 3. WidgetRef
 
@@ -368,9 +377,18 @@ class UserPage extends ConsumerWidget {
       loading: () => LoadingWidget(),
       error: (error, stack) => ErrorScreen(error: error),
     );
-  }
-}
 ```
+
+## Provider Organization by Architecture Layer
+
+To preserve separation of concerns and avoid tangled dependencies, place providers according to their layer:
+
+| Layer | Path | Purpose | Examples |
+|-------|------|---------|----------|
+| **Presentation Core** | `lib/src/presentation/core/providers/` | App-wide UI state | `themeModeProvider`, `navigatorKeyProvider` |
+| **Presentation Feature** | `lib/src/presentation/feature/[feature]/[screen]/view_model/` | Screen-specific state & ViewModels | `chatProvider`, `dailyVerseProvider` |
+| **Data Services** | `lib/src/data/services/` | Clients and storage instances | `dioProvider`, `restClientProvider`, `cacheServiceProvider` |
+| **Data Repositories** | `lib/src/data/repositories/` | Repositories implementing domain contracts | `authRepositoryProvider` |
 
 ## Best Practices
 
