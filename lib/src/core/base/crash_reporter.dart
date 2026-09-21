@@ -13,3 +13,13 @@ abstract interface class CrashReporter {
   void recordFlutterError(FlutterErrorDetails details,{ bool fatal = false});
   void recordError(dynamic message, Object error, StackTrace? stackTrace);
 }
+
+
+/// Create a Provder of [CrashReporter] for Singleton pattern & centralized crash reporting
+/// for the entire app. But Provider for [Api] is needed too for Dependency injection of
+/// [crashReporterProvider], then ref.read(apiProvider).call(...) instead of static Api.call())
+///
+// final crashReporterProvider = Provider<CrashReporter>((ref) {
+
+//   return kDebugMode ? LoggingCrashReporter() : FirebaseCrashReporter();
+// });
