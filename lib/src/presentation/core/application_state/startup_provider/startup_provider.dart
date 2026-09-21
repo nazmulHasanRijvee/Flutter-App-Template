@@ -11,7 +11,6 @@ final startupProvider = FutureProvider<void>((ref) async {
   await ref.read(localizationProvider.notifier).setCurrentLocale();
 });
 
-
 /// [startupProvider] is eagerly initialized by go_router's redirect logic
 /// (via [routerStateProvider]) before any UI is rendered, ensuring all
 /// startup tasks complete before the first screen appears

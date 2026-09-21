@@ -3,5 +3,5 @@
     "files.autoSave": "afterDelay",
     "window.zoomLevel": 0,
     "workbench.colorTheme": "Default Dark+",
-    "workbench.preferredDarkColorTheme": "Default Dark+",
+    "workbench.preferredDarkColorTheme": "Dark+",
 }

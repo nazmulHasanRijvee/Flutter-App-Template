@@ -2,11 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app_template/src/core/initialize_crash_reporting.dart';
-import 'package:flutter_app_template/src/core/logger/app_logger.dart';
+import 'package:flutter_app_template/src/core/base/crash_reporter.dart';
+import 'package:flutter_app_template/src/core/base/initialize_crash_reporting.dart';
 
 Future<void> bootstrap(VoidCallback onRun) async {
-  await initializeCrashReporting();
+  //   await Firebase.initializeApp(
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+
+  // In debug mode: log to console. In release/profile mode: report to Firebase Crashlytics.
+  // late final CrashReporter reporter;
+  // if (kDebugMode) {
+  //   reporter = const LoggingCrashReporter();
+  // } else {
+  //   reporter = const FirebaseCrashReporter();
+  // }
+
+  await initializeCrashReporting(const LoggingCrashReporter());
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -19,11 +31,5 @@ Future<void> bootstrap(VoidCallback onRun) async {
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runZonedGuarded(onRun, (error, stackTrace) {
-    AppLogger.error(
-      'Uncaught zone error: $error',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  });
+  onRun();
 }

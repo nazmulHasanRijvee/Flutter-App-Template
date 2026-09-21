@@ -13,7 +13,7 @@ import '../routes.dart';
 /// - Splash while startup is pending or failed;
 /// - onboarding until completed;
 /// - then homeScreen or login by session.
-/// 
+///
 /// New inputs (a force-update flag, a maintenance mode) compose here
 /// without touching the router.
 ///
@@ -32,7 +32,6 @@ final routerStateProvider = Provider<Routes>((ref) {
     SessionStatus.unauthenticated => Routes.login,
   };
 });
-
 
 /// [routerStateProvider] is a pure derived state, it watches app-level
 /// providers ([startupProvider], [onboardingStatusProvider], [sessionStatusProvider])

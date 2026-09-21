@@ -27,10 +27,10 @@ final logoutProvider = AsyncNotifierProvider<LogoutNotifier, bool?>(
 
 /// The UI triggers logout by calling [LogoutNotifier.call] via
 /// `ref.read(logoutProvider.notifier).call()`, which clears the session.
-/// 
+///
 /// go_router then reactively detects the [sessionStatusProvider] state change
 /// and automatically redirects to the login screen. Thats why its known  as a
 /// reactive state-driven routing
-/// 
+///
 /// [logoutProivder] is resposible for logging out logic only
 /// while go_router is responsible for only routing/navigation when logged out

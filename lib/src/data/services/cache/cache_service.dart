@@ -25,7 +25,7 @@ abstract interface class CacheService {
 }
 
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('Initialize this in main');
+  throw UnimplementedError('Initialize this in main.dart');
 });
 
 final cacheServiceProvider = Provider<CacheService>((ref) {
