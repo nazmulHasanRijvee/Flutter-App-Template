@@ -31,8 +31,6 @@ class DioClient {
       ),
       TokenRefreshInterceptor(
         // onError: refresh token
-        baseUrl: Endpoints.base,
-        refreshTokenEndpoint: Endpoints.refreshToken,
         tokenManager: tokenManager,
         dio: dio,
         onSessionExpired: () => ref.invalidate(sessionStatusProvider),

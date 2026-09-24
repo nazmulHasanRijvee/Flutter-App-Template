@@ -38,7 +38,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
           refresh: data['refreshToken'] as String,
         );
 
-
         if (shouldRemember) {
           try {
             await _saveSession();
@@ -71,7 +70,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     await local.save(CacheKey.rememberMe, rememberMe);
     return rememberMe;
   }
-
 
   @override
   Future<bool> restoreSession() async {
