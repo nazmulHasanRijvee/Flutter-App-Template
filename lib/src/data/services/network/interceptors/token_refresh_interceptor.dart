@@ -16,12 +16,10 @@ class TokenRefreshInterceptor extends Interceptor {
   TokenRefreshInterceptor({
     required this.tokenManager,
     required this.dio,
-    required this.onSessionExpired,
   });
 
   final TokenManager tokenManager;
   final Dio dio;
-  final void Function() onSessionExpired;
 
   static const _retriedKey = 'auth.retried';
 
@@ -40,7 +38,6 @@ class TokenRefreshInterceptor extends Interceptor {
       await tokenManager.refresh();
     } catch (refreshError, stackTrace) {
       AppLogger.error("Token refresh failed", error: refreshError, stackTrace: stackTrace);
-      if (!tokenManager.hasSession) onSessionExpired();
       return handler.next(err);
     }
 

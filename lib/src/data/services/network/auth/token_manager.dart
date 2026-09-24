@@ -33,6 +33,11 @@ class TokenManager {
   final TokenStore _store;
   final String _refreshEndpoint;
   final Dio _refreshDio;
+  final StreamController<bool> _sessionController =
+      StreamController<bool>.broadcast();
+
+  /// Emits `true` when tokens are saved and `false` when the session is cleared.
+  Stream<bool> get sessionStream => _sessionController.stream;
 
   late final Future<void> _ready;
   String? _accessToken;
@@ -70,6 +75,8 @@ class TokenManager {
     if (refresh != null) {
       _refreshToken = refresh;
     }
+
+    _sessionController.add(true);
   }
 
   /// Removes the current session from memory and secure storage.
@@ -78,6 +85,12 @@ class TokenManager {
     _accessToken = null;
     _refreshToken = null;
     await _store.clear();
+    _sessionController.add(false);
+  }
+
+  /// Closes the session broadcast controller.
+  void dispose() {
+    _sessionController.close();
   }
 
   /// Refreshes the access token. Concurrent callers share one HTTP roundtrip.
@@ -176,9 +189,11 @@ final tokenStoreProvider = Provider<TokenStore>((ref) {
 });
 
 final tokenManagerProvider = Provider<TokenManager>((ref) {
-  return TokenManager(
+  final manager = TokenManager(
     store: ref.read(tokenStoreProvider),
     refreshBaseUrl: Endpoints.base,
     refreshEndpoint: Endpoints.refreshToken,
   );
+  ref.onDispose(manager.dispose);
+  return manager;
 });

@@ -16,6 +16,9 @@ class RouterRepositoryImpl extends RouterRepository {
   }
 
   @override
+  Stream<bool> get sessionStream => tokens.sessionStream;
+
+  @override
   Future<bool> hasSession() async {
     final refreshToken = await tokens.refreshToken;
 
@@ -28,7 +31,7 @@ class RouterRepositoryImpl extends RouterRepository {
   }
 }
 
-final routerRepoProvider = Provider<RouterRepositoryImpl>((ref) {
+final routerRepoProvider = Provider<RouterRepository>((ref) {
   final cacheService = ref.watch(cacheServiceProvider);
   final tokenManager = ref.watch(tokenManagerProvider);
   return RouterRepositoryImpl(cacheService: cacheService, tokens: tokenManager);

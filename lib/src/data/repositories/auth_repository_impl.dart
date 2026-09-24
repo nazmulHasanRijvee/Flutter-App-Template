@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/repositories/auth_repository.dart';
-import '../../presentation/core/application_state/session_status_provider/session_status_provider.dart';
 import '../services/cache/cache_service.dart';
 import '../services/network/api_handler.dart';
 import '../services/network/auth/token_manager.dart';
@@ -12,15 +11,11 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
     required this.remote,
     required this.local,
     required this.tokens,
-    required this.onSessionChanged,
   });
 
   final RestClient remote;
   final CacheService local;
   final TokenManager tokens;
-
-  /// Notifies the presentation layer after the stored session changes.
-  final void Function() onSessionChanged;
 
   @override
   Future<bool> login({
@@ -46,8 +41,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
             rethrow;
           }
         }
-
-        onSessionChanged();
 
         loggedIn = true;
       },
@@ -80,7 +73,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
 
     if (!remembered && hasSession) {
       await tokens.clearSession();
-      onSessionChanged();
     }
     return remembered;
   }
@@ -89,7 +81,6 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<bool> logout() async {
     await local.remove([CacheKey.isLoggedIn, CacheKey.rememberMe]);
     await tokens.clearSession();
-    onSessionChanged();
     return true;
   }
 }
@@ -99,6 +90,5 @@ final authRepositoryProvider = Provider<AuthenticationRepository>((ref) {
     remote: ref.watch(restClientProvider),
     local: ref.watch(cacheServiceProvider),
     tokens: ref.watch(tokenManagerProvider),
-    onSessionChanged: () => ref.invalidate(sessionStatusProvider),
   );
 });

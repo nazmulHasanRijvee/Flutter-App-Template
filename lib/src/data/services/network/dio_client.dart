@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_app_template/src/presentation/core/application_state/session_status_provider/session_status_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth/token_manager.dart';
@@ -33,7 +32,6 @@ class DioClient {
         // onError: refresh token
         tokenManager: tokenManager,
         dio: dio,
-        onSessionExpired: () => ref.invalidate(sessionStatusProvider),
       ),
       if (kDebugMode) // disable logging only in production (release mode)
         // Auth request and response bodies may contain passwords and tokens.

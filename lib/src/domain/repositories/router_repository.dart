@@ -5,5 +5,8 @@ abstract class RouterRepository {
   /// source of truth — not from a cached flag that can go stale.
   Future<bool> hasSession();
 
+  /// Emits updates whenever the underlying session state changes.
+  Stream<bool> get sessionStream;
+
   Future<void> saveOnboardingAsCompleted();
 }
