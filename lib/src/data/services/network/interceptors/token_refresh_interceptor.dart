@@ -1,8 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../presentation/core/routes/routes.dart';
 import '../../auth/auth_service.dart';
 
 class TokenRefreshInterceptor extends Interceptor {
@@ -10,14 +7,12 @@ class TokenRefreshInterceptor extends Interceptor {
     required this.baseUrl,
     required this.refreshTokenEndpoint,
     required this.authService,
-    required this.navigatorKey,
     required this.dio,
   });
 
   final String baseUrl;
   final String refreshTokenEndpoint;
   final AuthService authService;
-  final GlobalKey<NavigatorState> navigatorKey;
   final Dio dio;
 
   /// A bare Dio instance with NO interceptors, used exclusively for
@@ -133,22 +128,9 @@ class TokenRefreshInterceptor extends Interceptor {
     DioException originalError,
     ErrorInterceptorHandler handler,
   ) async {
-    await _removeTokens();
-    _navigateToLoginScreen();
-    handler.reject(originalError);
-  }
-
-  Future<void> _removeTokens() async {
+    // remove tokens and go_router listening throgh [sessionProvider] will redirect to login page
     await authService.clearSession();
-  }
-
-  void _navigateToLoginScreen() {
-    if (navigatorKey.currentState?.mounted == true) {
-      navigatorKey.currentState?.context.goNamed(
-        Routes.login.path,
-        extra: true,
-      );
-    }
+    handler.reject(originalError);
   }
 
   Future<void> saveToken(String value) async {

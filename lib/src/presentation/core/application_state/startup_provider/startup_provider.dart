@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/localization_provider.dart';
+import '../localization_provider/localization_provider.dart';
 
 /// Runs once at app startup to initialize application-level state.
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../application_state/onboarding_status_provider/onboarding_status_provider.dart';
+import '../../../feature/onboarding/view_model/onboarding_status_provider.dart';
 import '../../application_state/session_status_provider/session_status_provider.dart';
 import '../../application_state/startup_provider/startup_provider.dart';
 import '../routes.dart';

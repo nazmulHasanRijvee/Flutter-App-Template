@@ -1,4 +1,4 @@
-part of '../part_of.dart';
+part of '../router.dart';
 
 StatefulShellRoute _shellRoutes(Ref ref) {
   return StatefulShellRoute.indexedStack(

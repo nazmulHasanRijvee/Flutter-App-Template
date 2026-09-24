@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../presentation/core/providers/navigator_key_provider.dart'
-    show navigatorKeyProvider;
 import '../auth/auth_service.dart';
 import 'endpoints.dart';
 import 'interceptors/access_token_interceptor.dart';
@@ -33,7 +31,6 @@ class DioClient {
         baseUrl: Endpoints.base,
         refreshTokenEndpoint: Endpoints.refreshToken,
         authService: ref.read(authServiceProvider),
-        navigatorKey: ref.read(navigatorKeyProvider),
         dio: dio,
       ),
       if (kDebugMode) // disable logging only in production (release mode)

@@ -5,9 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../../core/gen/assets.gen.dart';
-import '../../../../core/routes/routes.dart';
-import '../../../../core/theme/theme.dart';
+import '../../../../core/gen/assets.gen.dart';
+import '../../../core/router/routes.dart';
+import '../../../core/theme/theme.dart';
 
 class StartTodayScreen extends StatelessWidget {
   const StartTodayScreen({super.key});

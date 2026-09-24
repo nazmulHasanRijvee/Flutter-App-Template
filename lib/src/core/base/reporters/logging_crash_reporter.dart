@@ -12,6 +12,5 @@ class LoggingCrashReporter implements CrashReporter {
   @override
   void recordError(dynamic message, Object error, StackTrace? stackTrace, {bool fatal = false}) {
     AppLogger.error('CrashReporter: $message', error: error, stackTrace: stackTrace);
-    if (stackTrace != null) AppLogger.error(stackTrace.toString());
   }
 }

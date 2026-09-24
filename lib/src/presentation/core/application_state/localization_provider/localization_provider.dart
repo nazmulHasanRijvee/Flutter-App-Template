@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/repositories/locale_repository_impl.dart';
+import '../../../../data/repositories/locale_repository_impl.dart';
 
 class LocalizationNotifier extends Notifier<Locale> {
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/services/auth/auth_service.dart';
-import '../session_status_provider/session_status_provider.dart';
+import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 
 /// Handles the logout flow, clears the persisted session through [AuthService]
 /// and invalidates or dispose [sessionStatusProvider] so the go_router's [routerStateProvider]

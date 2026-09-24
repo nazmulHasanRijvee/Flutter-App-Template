@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import '../routes/routes.dart';
+import '../router/routes.dart';
 import '../theme/theme.dart';
 
 /// `errorBuilder` destination for unmatched routes. The button targets
