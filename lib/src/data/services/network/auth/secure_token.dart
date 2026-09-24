@@ -26,8 +26,8 @@ class SecureTokenStore implements TokenStore {
   final FlutterSecureStorage _storage;
 
   static const _keys = <TokenKey, String>{
-    .access: 'auth.access_token',
-    .refresh: 'auth.refresh_token',
+    TokenKey.access: 'auth.access_token',
+    TokenKey.refresh: 'auth.refresh_token',
   };
 
   String _keyFor(TokenKey key) => _keys[key]!;

@@ -22,16 +22,16 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
     await cacheService.save<String>(CacheKey.themeMode, themeMode.name);
   }
 
-  Future<ThemeMode> loadTheme() async {
+  Future<void> setCurrentThemeMode() async {
     final cacheService = ref.read(cacheServiceProvider);
     final String? themeMode = cacheService.get<String>(CacheKey.themeMode);
     if (themeMode != null) {
-      return ThemeMode.values.firstWhere(
+      state = ThemeMode.values.firstWhere(
         (element) => element.name == themeMode,
         orElse: () => ThemeMode.system,
       );
     }
-    return ThemeMode.system;
+    state = ThemeMode.system;
   }
 }
 

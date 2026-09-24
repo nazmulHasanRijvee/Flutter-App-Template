@@ -11,7 +11,7 @@ import '../theme_mode_provider/theme_mode_provider.dart';
 final startupProvider = FutureProvider<void>((ref) async {
   await ref.read(authRepositoryProvider).restoreSession();
   await ref.read(localizationProvider.notifier).setCurrentLocale();
-  await ref.read(themeModeProvider.notifier).loadTheme();
+  await ref.read(themeModeProvider.notifier).setCurrentThemeMode();
 });
 
 /// [startupProvider] is eagerly initialized by go_router's redirect logic

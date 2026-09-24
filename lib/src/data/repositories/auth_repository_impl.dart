@@ -74,7 +74,11 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<bool> restoreSession() async {
     final remembered = local.get<bool>(CacheKey.isLoggedIn) ?? false;
-    if (!remembered || await tokens.refreshToken == null) {
+    
+    final refreshToken = await tokens.refreshToken;
+    final hasSession = refreshToken != null && refreshToken.isNotEmpty;
+
+    if (!remembered && hasSession) {
       await tokens.clearSession();
       onSessionChanged();
     }
