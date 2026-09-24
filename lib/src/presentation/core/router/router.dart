@@ -11,7 +11,7 @@ import '../../feature/ask/ask_screen/view/ask_screen.dart';
 import '../../feature/auth/create_new_password/view/create_new_pass_screen.dart';
 import '../../feature/auth/reset_password/view/reset_pass_screen.dart';
 import '../../feature/auth/register_screen/view/register_screen.dart';
-import '../../feature/auth/sign_in_screen/view/sign_in_screen.dart';
+import '../../feature/auth/login_screen/view/login_screen.dart';
 import '../../feature/auth/email_verification/view/email_verification_screen.dart';
 import '../../feature/community/community_screen/view/community_screen.dart';
 import '../../feature/home/bottom_nav_bar/view/bottom_nav_bar.dart';

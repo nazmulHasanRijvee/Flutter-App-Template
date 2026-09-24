@@ -1,14 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../data/repositories/auth_repository_impl.dart';
 import '../localization_provider/localization_provider.dart';
+import '../theme_mode_provider/theme_mode_provider.dart';
 
 /// Runs once at app startup to initialize application-level state.
 ///
-/// Currently loads the persisted locale so the app opens in the user's
-/// last-selected language. Additional startup tasks (e.g. remote config
-/// fetching) can be added here and awaited before the UI is shown.
+/// Restores the remember-me session policy and loads the persisted locale and
+/// theme before the first route is selected.
 final startupProvider = FutureProvider<void>((ref) async {
+  await ref.read(authRepositoryProvider).restoreSession();
   await ref.read(localizationProvider.notifier).setCurrentLocale();
+  await ref.read(themeModeProvider.notifier).loadTheme();
 });
 
 /// [startupProvider] is eagerly initialized by go_router's redirect logic

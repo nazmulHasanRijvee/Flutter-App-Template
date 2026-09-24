@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_app_template/src/core/logger/app_logger.dart';
 
-
 part "reporters/logging_crash_reporter.dart";
 part "reporters/firebase_crashlytics_reporter.dart";
 
@@ -10,10 +9,9 @@ part "reporters/firebase_crashlytics_reporter.dart";
 /// Replace the implementation to connect Crashlytics, Sentry, or another
 /// telemetry service.
 abstract interface class CrashReporter {
-  void recordFlutterError(FlutterErrorDetails details,{ bool fatal = false});
+  void recordFlutterError(FlutterErrorDetails details, {bool fatal = false});
   void recordError(dynamic message, Object error, StackTrace? stackTrace);
 }
-
 
 /// Create a Provder of [CrashReporter] for Singleton pattern & centralized crash reporting
 /// for the entire app. But Provider for [Api] is needed too for Dependency injection of

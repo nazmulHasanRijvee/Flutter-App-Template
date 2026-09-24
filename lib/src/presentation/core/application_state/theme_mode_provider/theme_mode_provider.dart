@@ -2,18 +2,18 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_app_template/src/data/services/cache/cache_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ThemeModeNotifier extends AsyncNotifier<ThemeMode> {
+class ThemeModeNotifier extends Notifier<ThemeMode> {
   @override
-  Future<ThemeMode> build() async {
-    return await _loadTheme();
+  ThemeMode build() {
+    return ThemeMode.system;
   }
 
-  ThemeMode get themeMode => state.value ?? ThemeMode.system;
+  ThemeMode get themeMode => state;
 
   List<ThemeMode> get supportedThemes => ThemeMode.values;
 
   Future<void> changeTheme(ThemeMode newTheme) async {
-    state = AsyncValue.data(newTheme);
+    state = newTheme;
     await _saveTheme(newTheme);
   }
 
@@ -22,7 +22,7 @@ class ThemeModeNotifier extends AsyncNotifier<ThemeMode> {
     await cacheService.save<String>(CacheKey.themeMode, themeMode.name);
   }
 
-  Future<ThemeMode> _loadTheme() async {
+  Future<ThemeMode> loadTheme() async {
     final cacheService = ref.read(cacheServiceProvider);
     final String? themeMode = cacheService.get<String>(CacheKey.themeMode);
     if (themeMode != null) {
@@ -35,6 +35,6 @@ class ThemeModeNotifier extends AsyncNotifier<ThemeMode> {
   }
 }
 
-final themeModeProvider = AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>(
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );

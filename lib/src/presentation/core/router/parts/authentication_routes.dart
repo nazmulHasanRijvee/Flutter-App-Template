@@ -6,7 +6,7 @@ List<GoRoute> _authenticationRoutes(Ref ref) {
       path: Routes.login.path,
       name: Routes.login.name,
       pageBuilder: (context, state) {
-        return const MaterialPage(child: SignInScreen());
+        return const MaterialPage(child: LoginScreen());
       },
       routes: [
         GoRoute(

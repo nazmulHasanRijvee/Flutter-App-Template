@@ -10,23 +10,17 @@ class Api {
     required FutureOr<void> Function(T response) onSuccess,
     required FutureOr<void> Function(String error) onError,
   }) async {
-    final HttpResponse<T> result;
-
     try {
-      result = await action;
+      final result = await action;
+      await onSuccess(result.data);
     } on DioException catch (err, stackTrace) {
-      // 1. DioException occured and Backend returned a JSON map with 'message'
-      final request = err.requestOptions;
       final response = err.response;
       final data = response?.data;
 
       AppLogger.error(
-        'DioException [${err.type}] ${request.method} ${request.uri}\n'
-        'Status Code: ${response?.statusCode}\n'
-        'Headers: ${request.headers}\n'
-        'Request Body: ${request.data}\n'
-        'Response Body: ${response?.data}',
-        error: err,
+        'DioException [${err.type}] ${err.requestOptions.method} '
+        '${err.requestOptions.uri} (status: ${response?.statusCode})',
+        error: err.error,
         stackTrace: stackTrace,
       );
 
@@ -46,8 +40,6 @@ class Api {
       await onError(errorMsg);
       return;
     } catch (err, stackTrace) {
-      // Generic fallback for unexpected errors like fromJson failures, TypeErors,
-      // Anything Dio didn't wrap
       AppLogger.error(
         'Unexpected Exception',
         error: err,
@@ -56,8 +48,5 @@ class Api {
       await onError(err.toString());
       return;
     }
-
-    // Business logic runs outside try-catch
-    await onSuccess(result.data);
   }
 }

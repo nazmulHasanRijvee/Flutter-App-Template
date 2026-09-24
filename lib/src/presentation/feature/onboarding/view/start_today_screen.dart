@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -8,12 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/gen/assets.gen.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../view_model/onboarding_status_provider.dart';
 
-class StartTodayScreen extends StatelessWidget {
+class StartTodayScreen extends ConsumerWidget {
   const StartTodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: Stack(
         alignment: .bottomCenter,
@@ -94,10 +96,13 @@ class StartTodayScreen extends StatelessWidget {
                     180.verticalSpace,
 
                     GestureDetector(
-                          onTap: () {
-                            context.push(Routes.register.path);
-
-                            /// changing here original route is contex.go homeScreen
+                          onTap: () async {
+                            // Persist onboarding first. Updating the notifier
+                            // changes routerStateProvider; go_router then
+                            // sends this user to login (no imperative push).
+                            await ref
+                                .read(onboardingStatusProvider.notifier)
+                                .completeOnboarding();
                           },
                           child:
                               Container(

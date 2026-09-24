@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_app_template/src/presentation/core/application_state/session_status_provider/session_status_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../auth/auth_service.dart';
+import 'auth/token_manager.dart';
 import 'endpoints.dart';
 import 'interceptors/access_token_interceptor.dart';
 import 'interceptors/token_refresh_interceptor.dart';
@@ -21,20 +22,24 @@ class DioClient {
       ),
     );
 
+    final tokenManager = ref.read(tokenManagerProvider);
+
     dio.interceptors.addAll([
       AccessTokenInterceptor(
         // onRequest: attach token
-        authService: ref.read(authServiceProvider),
+        tokenManager: tokenManager,
       ),
       TokenRefreshInterceptor(
         // onError: refresh token
         baseUrl: Endpoints.base,
         refreshTokenEndpoint: Endpoints.refreshToken,
-        authService: ref.read(authServiceProvider),
+        tokenManager: tokenManager,
         dio: dio,
+        onSessionExpired: () => ref.invalidate(sessionStatusProvider),
       ),
       if (kDebugMode) // disable logging only in production (release mode)
-        LogInterceptor(requestBody: true, responseBody: true), // always last
+        // Auth request and response bodies may contain passwords and tokens.
+        LogInterceptor(requestBody: false, responseBody: false), // always last
     ]);
 
     return dio;

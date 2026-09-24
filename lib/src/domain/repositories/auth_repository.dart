@@ -1,17 +1,15 @@
 abstract interface class AuthenticationRepository {
-  Future<Map<String, dynamic>> register(Map<String, dynamic> data);
-
-  Future<Map<String, dynamic>> login(Map<String, dynamic> data);
+  Future<bool> login({
+    required String username,
+    required String password,
+    bool shouldRemember = false,
+  });
 
   Future<bool> rememberMe({bool? rememberMe});
 
-  Future<String> forgotPassword(Map<String, dynamic> data);
+  Future<bool> logout();
 
-  Future<String> resetPassword(Map<String, dynamic> data);
-
-  Future<String> verifyOTP(Map<String, dynamic> data);
-
-  Future<String> resendOTP(Map<String, dynamic> data);
-
-  Future<void> logout();
+  /// Called once at startup. Clears tokens left from a previous run when the
+  /// user did not choose to keep the session across restarts.
+  Future<bool> restoreSession();
 }

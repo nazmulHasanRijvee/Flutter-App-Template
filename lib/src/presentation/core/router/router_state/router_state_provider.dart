@@ -27,9 +27,11 @@ final routerStateProvider = Provider<Routes>((ref) {
 
   if (!ref.watch(onboardingStatusProvider)) return Routes.onboarding;
 
-  return switch (ref.watch(sessionStatusProvider)) {
-    SessionStatus.authenticated => Routes.homeScreen,
-    SessionStatus.unauthenticated => Routes.login,
+  final session = ref.watch(sessionStatusProvider);
+  return switch (session) {
+    AsyncData(value: SessionStatus.authenticated) => Routes.homeScreen,
+    AsyncData() => Routes.login,
+    _ => Routes.splash,
   };
 });
 

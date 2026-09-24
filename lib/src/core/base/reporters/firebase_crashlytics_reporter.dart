@@ -9,7 +9,7 @@ class FirebaseCrashReporter implements CrashReporter {
   // final _crashlytics = FirebaseCrashlytics.instance;
 
   @override
-  void recordFlutterError(FlutterErrorDetails details,{ bool fatal = false}) {
+  void recordFlutterError(FlutterErrorDetails details, {bool fatal = false}) {
     // _crashlytics.recordFlutterError(
     //  details,
     //  fatal: fatal
