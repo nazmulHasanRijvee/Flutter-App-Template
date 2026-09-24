@@ -55,7 +55,13 @@ class TokenRefreshInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     if (_isRefreshing) {
-      _queue.add(_QueuedRequest(options: err.requestOptions, handler: handler, error: err));
+      _queue.add(
+        _QueuedRequest(
+          options: err.requestOptions,
+          handler: handler,
+          error: err,
+        ),
+      );
       return;
     }
 
@@ -139,10 +145,7 @@ class TokenRefreshInterceptor extends Interceptor {
     if (newRefreshToken != null) {
       // Backend rotated the refresh token — must save both or the
       // next refresh attempt uses a now-dead refresh token.
-      await tokenManager.saveTokens(
-        access: newToken,
-        refresh: newRefreshToken,
-      );
+      await tokenManager.saveTokens(access: newToken, refresh: newRefreshToken);
     } else {
       // Backend doesn't rotate — access token only.
       await tokenManager.saveTokens(access: newToken);
@@ -203,7 +206,11 @@ class TokenRefreshInterceptor extends Interceptor {
 }
 
 class _QueuedRequest {
-  const _QueuedRequest({required this.options, required this.handler, required this.error});
+  const _QueuedRequest({
+    required this.options,
+    required this.handler,
+    required this.error,
+  });
 
   final RequestOptions options;
   final ErrorInterceptorHandler handler;

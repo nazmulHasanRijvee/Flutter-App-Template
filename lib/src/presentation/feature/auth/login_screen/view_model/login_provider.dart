@@ -22,7 +22,7 @@ final rememberMeProvider = AsyncNotifierProvider<RememberMeNotifier, bool>(
   RememberMeNotifier.new,
 );
 
-/// Minimal login action state for the sign-in screen.
+/// Minimal login action state for the login screen.
 class LoginNotifier extends AsyncNotifier<bool?> {
   @override
   Future<bool?> build() async => null;

@@ -73,7 +73,5 @@ final tokenStoreProvider = Provider<TokenStore>((ref) {
 });
 
 final tokenManagerProvider = Provider<TokenManager>((ref) {
-  return TokenManager(
-    store: ref.read(tokenStoreProvider),
-  );
+  return TokenManager(store: ref.read(tokenStoreProvider));
 });

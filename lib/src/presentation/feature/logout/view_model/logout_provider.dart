@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../data/services/auth/auth_service.dart';
-import '../../../core/application_state/session_status_provider/session_status_provider.dart';
+import '../../../../data/repositories/auth_repository_impl.dart';
 
-/// Handles the logout flow, clears the persisted session through [AuthService]
-/// and invalidates or dispose [sessionStatusProvider] so the go_router's [routerStateProvider]
-/// immediately redirects to the unauthenticated screens (login screen)
+/// Handles logout through the authentication repository. The repository
+/// invalidates session state after the token session is cleared, causing
+/// go_router to redirect to the unauthenticated routes.
 class LogoutNotifier extends AsyncNotifier<bool?> {
   @override
   Future<bool?> build() async => null;
@@ -13,10 +12,7 @@ class LogoutNotifier extends AsyncNotifier<bool?> {
   Future<void> call() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final authService = ref.read(authServiceProvider);
-      await authService.clearSession();
-      ref.invalidate(sessionStatusProvider);
-      return true;
+      return ref.read(authRepositoryProvider).logout();
     });
   }
 }
