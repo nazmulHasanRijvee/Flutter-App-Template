@@ -2,7 +2,7 @@ abstract interface class AuthenticationRepository {
   Future<bool> login({
     required String username,
     required String password,
-    bool shouldRemember = false,
+    bool shouldRemember = true,
   });
 
   Future<bool> rememberMe({bool? rememberMe});

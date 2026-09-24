@@ -54,7 +54,7 @@ class _SignInScreenState extends ConsumerState<LoginScreen> {
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Remember me'),
-              value: rememberMe.value ?? false,
+              value: rememberMe.value ?? true,
               onChanged: rememberMe.isLoading
                   ? null
                   : (value) {

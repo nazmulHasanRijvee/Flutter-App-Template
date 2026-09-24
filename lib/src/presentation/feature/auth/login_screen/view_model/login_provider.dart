@@ -7,6 +7,7 @@ import '../../../../../data/repositories/auth_repository_impl.dart';
 class RememberMeNotifier extends AsyncNotifier<bool> {
   @override
   Future<bool> build() {
+    /// "Remember me" is checked ON by default for first-time users
     return ref.read(authRepositoryProvider).rememberMe();
   }
 

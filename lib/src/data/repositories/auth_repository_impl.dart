@@ -26,7 +26,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   Future<bool> login({
     required String username,
     required String password,
-    bool shouldRemember = false,
+    bool shouldRemember = true,
   }) async {
     bool loggedIn = false;
 
@@ -64,7 +64,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<bool> rememberMe({bool? rememberMe}) async {
     if (rememberMe == null) {
-      return local.get<bool>(CacheKey.rememberMe) ?? false;
+      return local.get<bool>(CacheKey.rememberMe) ?? true; /// Defaults to true
     }
 
     await local.save(CacheKey.rememberMe, rememberMe);
