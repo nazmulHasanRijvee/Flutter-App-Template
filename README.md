@@ -93,7 +93,7 @@ lib/
         └── feature/                 # Feature screens, providers, and widgets
 ```
 
-See [docs/ProjectStructure.md](docs/ProjectStructure.md) for the detailed map and feature conventions.
+See [docs/getting_started/project_structure.md](docs/getting_started/project_structure.md) for the detailed map and feature conventions.
 
 ## Architecture at a glance
 
@@ -112,9 +112,9 @@ The route policy lives in `lib/src/presentation/core/routes/` and is intentional
 
 More detail is available in:
 
-- [Architecture](docs/Architecture.md)
-- [State management and routing](docs/StateManagement.md)
-- [Project structure](docs/ProjectStructure.md)
+- [Architecture](docs/architecture/architecture.md)
+- [State management](docs/architecture/state_management.md)
+- [Project structure](docs/getting_started/project_structure.md)
 
 ## Networking and environment values
 
@@ -124,14 +124,15 @@ The network layer is organized as follows:
 - `DioClient` configures timeouts, JSON headers, authentication, token refresh, and debug request logging.
 - `RestClient` declares typed Retrofit endpoints and is backed by the generated `rest_client.g.dart` file.
 - `Api.call` converts Dio and unexpected exceptions into success/error callbacks and logs failures.
+- `TokenManager` & `TokenRefreshInterceptor` handle automatic token refreshing and rotation.
 
-See [docs/Networking.md](docs/Networking.md) before adding an endpoint or changing authentication behavior.
+See [docs/network/networking.md](docs/network/networking.md) and [docs/network/token_refresh_logic.md](docs/network/token_refresh_logic.md) for details.
 
 ## Error reporting
 
 The active implementation is `LoggingCrashReporter`. It receives Flutter framework errors and uncaught platform/asynchronous errors through `initializeCrashReporting`, then sends them to `AppLogger`.
 
-A Firebase Crashlytics reporter skeleton is present for future use, but Firebase packages and initialization are not currently enabled. See [docs/ErrorHandling.md](docs/ErrorHandling.md).
+A Firebase Crashlytics reporter skeleton is present for future use, but Firebase packages and initialization are not currently enabled. See [docs/error_handling/error_handling.md](docs/error_handling/error_handling.md).
 
 ## Adding a feature
 
@@ -142,7 +143,7 @@ A Firebase Crashlytics reporter skeleton is present for future use, but Firebase
 5. Add providers for feature state and keep persistence/network access outside widgets.
 6. Add tests and run `flutter analyze` and `flutter test`.
 
-Use [docs/Conventions.md](docs/Conventions.md) for naming, provider, route, and feature guidelines.
+Use [docs/architecture/conventions.md](docs/architecture/conventions.md) for naming, provider, route, and feature guidelines.
 
 ## Platform support
 
@@ -150,19 +151,20 @@ The repository includes Flutter targets for Android, iOS, Web, Windows, macOS, a
 
 ## Documentation
 
-The [docs](docs/) directory contains the project guide:
+The [docs](docs/) directory contains the full documentation suite:
 
-- [Getting started](docs/GettingStarted.md)
-- [Architecture](docs/Architecture.md)
-- [Project structure](docs/ProjectStructure.md)
-- [State management](docs/StateManagement.md)
-- [Routing](docs/Routing.md)
-- [Networking](docs/Networking.md)
-- [Persistence and authentication](docs/PersistenceAndAuth.md)
-- [Theming](docs/Theming.md)
-- [Error handling](docs/ErrorHandling.md)
-- [Conventions](docs/Conventions.md)
+- 🚀 [Getting started](docs/getting_started/getting_started.md)
+- 📁 [Project structure](docs/getting_started/project_structure.md)
+- 🏛️ [Architecture](docs/architecture/architecture.md)
+- 🔄 [State management](docs/architecture/state_management.md)
+- 🌐 [Networking](docs/network/networking.md)
+- 🔑 [Token refresh logic](docs/network/token_refresh_logic.md)
+- 🔐 [Authentication and persistence](docs/auth_and_storage/authentication_and_storage.md)
+- 🧭 [Routing](docs/routing/routing.md)
+- 🎨 [Theming](docs/theming/theming.md)
+- 🛡️ [Error handling](docs/error_handling/error_handling.md)
+- 📏 [Conventions](docs/architecture/conventions.md)
 
 ## License
 
-This repository is provided as a template. Add the license and project-specific contribution guidelines before publishing or distributing it.
+This repository is provided as a template. And Open Sourced
