@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_app_template/src/core/logger/app_logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part "reporters/logging_crash_reporter.dart";
 part "reporters/firebase_crashlytics_reporter.dart";
@@ -17,7 +18,7 @@ abstract interface class CrashReporter {
 /// for the entire app. But Provider for [Api] is needed too for Dependency injection of
 /// [crashReporterProvider], then ref.read(apiProvider).call(...) instead of static Api.call())
 ///
-// final crashReporterProvider = Provider<CrashReporter>((ref) {
-
-//   return kDebugMode ? LoggingCrashReporter() : FirebaseCrashReporter();
-// });
+/// NOTE: Make sure autoDispose is disabled if using Riverpod code generation
+final crashReporterProvider = Provider<CrashReporter>((ref) {
+  return kDebugMode ? LoggingCrashReporter() : FirebaseCrashReporter();
+});

@@ -116,7 +116,9 @@ class TokenManager {
           await clearSession();
         } catch (clearError, clearStack) {
           AppLogger.error(
-            "TokenManager.clearSession() failed", error: clearError, stackTrace: clearStack,
+            "TokenManager.clearSession() failed",
+            error: clearError,
+            stackTrace: clearStack,
           );
         }
       }
@@ -180,7 +182,11 @@ class TokenManager {
       _accessToken = await _store.read(TokenKey.access);
       _refreshToken = await _store.read(TokenKey.refresh);
     } catch (error, stackTrace) {
-      AppLogger.error("TokenManager._loadTokens failed", error: error, stackTrace: stackTrace);
+      AppLogger.error(
+        "TokenManager._loadTokens failed",
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

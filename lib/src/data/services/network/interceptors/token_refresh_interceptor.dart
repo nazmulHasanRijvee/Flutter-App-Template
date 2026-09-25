@@ -13,10 +13,7 @@ import '../auth/token_manager.dart';
 /// own concurrency control. Both live in [TokenManager] so they're correct
 /// no matter how many Dio clients need a token.
 class TokenRefreshInterceptor extends Interceptor {
-  TokenRefreshInterceptor({
-    required this.tokenManager,
-    required this.dio,
-  });
+  TokenRefreshInterceptor({required this.tokenManager, required this.dio});
 
   final TokenManager tokenManager;
   final Dio dio;
@@ -37,7 +34,11 @@ class TokenRefreshInterceptor extends Interceptor {
     try {
       await tokenManager.refresh();
     } catch (refreshError, stackTrace) {
-      AppLogger.error("Token refresh failed", error: refreshError, stackTrace: stackTrace);
+      AppLogger.error(
+        "Token refresh failed",
+        error: refreshError,
+        stackTrace: stackTrace,
+      );
       return handler.next(err);
     }
 

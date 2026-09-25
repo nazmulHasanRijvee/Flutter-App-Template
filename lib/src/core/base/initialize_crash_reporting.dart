@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_app_template/src/core/base/crash_reporter.dart';
 
-Future<void> initializeCrashReporting(CrashReporter reporter) async {
+void initializeCrashReporting(CrashReporter reporter) {
   /// Handles errors raised by Flutter during build, layout, or painting.
   FlutterError.onError = (details) {
     reporter.recordFlutterError(details, fatal: true);

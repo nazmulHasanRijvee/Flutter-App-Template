@@ -57,7 +57,8 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<bool> rememberMe({bool? rememberMe}) async {
     if (rememberMe == null) {
-      return local.get<bool>(CacheKey.rememberMe) ?? true; /// Defaults to true
+      /// Defaults to true
+      return local.get<bool>(CacheKey.rememberMe) ?? true;
     }
 
     await local.save(CacheKey.rememberMe, rememberMe);
@@ -67,7 +68,7 @@ class AuthenticationRepositoryImpl implements AuthenticationRepository {
   @override
   Future<bool> restoreSession() async {
     final remembered = local.get<bool>(CacheKey.isLoggedIn) ?? false;
-    
+
     final refreshToken = await tokens.refreshToken;
     final hasSession = refreshToken != null && refreshToken.isNotEmpty;
 
