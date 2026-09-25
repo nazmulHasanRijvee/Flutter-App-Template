@@ -165,6 +165,7 @@ class TokenManager {
     await _store.write(.access, newAccess);
     _accessToken = newAccess;
 
+    // refresh token rotation
     final newRefresh = data['refreshToken'];
     if (newRefresh is String && newRefresh.isNotEmpty) {
       await _store.write(.refresh, newRefresh);
@@ -179,7 +180,7 @@ class TokenManager {
       _accessToken = await _store.read(TokenKey.access);
       _refreshToken = await _store.read(TokenKey.refresh);
     } catch (error, stackTrace) {
-      AppLogger.error('TokenManager._loadTokens failed: $error\n$stackTrace');
+      AppLogger.error("TokenManager._loadTokens failed", error: error, stackTrace: stackTrace);
     }
   }
 }
