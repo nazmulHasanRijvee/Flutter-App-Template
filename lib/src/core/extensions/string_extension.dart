@@ -9,10 +9,6 @@ extension StringEx on String {
     return isEmpty ? onEmpty : this;
   }
 
-  String when(bool condition, {String onFalse = '', bool addSpace = true}) {
-    return condition ? (addSpace ? ' $this' : this) : onFalse;
-  }
-
   bool get isValidEmail {
     final reg = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -47,43 +43,17 @@ extension StringEx on String {
 
 extension NullableStringEx on String? {
   /// true if null or empty
-  bool get isNullOrEmpty => this == null || this!.isEmpty;
-
-  /// true if not null and not empty
-  bool get isNotNullOrEmpty => this != null && this!.isNotEmpty;
+  bool get isNullOrEmpty => this?.isEmpty ?? true;
 
   /// true if null, empty, or only whitespace
-  bool get isBlank => this == null || this!.trim().isEmpty;
-
-  /// true if contains non-whitespace characters
-  bool get isNotBlank => !isBlank;
-
-  /// returns empty string if null
-  String get orEmpty => this ?? '';
-
-  /// returns null if empty
-  String? get nullIfEmpty => (this?.isEmpty ?? true) ? null : this;
-
-  /// returns null if blank
-  String? get nullIfBlank =>
-      (this == null || this!.trim().isEmpty) ? null : this;
-
-  /// trimmed value or empty string
-  String get trimmed => this?.trim() ?? '';
+  bool get isNullOrBlank => this?.trim().isEmpty ?? true;
 
   /// trimmed value or null
   String? get trimmedOrNull {
-    final v = this?.trim();
-    return (v == null || v.isEmpty) ? null : v;
+    final value = this?.trim();
+    return (value?.isEmpty == true) ? null : value;
   }
 
   /// safe length
   int get safeLength => this?.length ?? 0;
-
-  /// returns default value if null
-  String or(String fallback) => this ?? fallback;
-
-  /// returns default if null or empty
-  String orIfEmpty(String fallback) =>
-      (this == null || this!.isEmpty) ? fallback : this!;
 }
