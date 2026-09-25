@@ -135,7 +135,7 @@ flutter:
 
 # flutter_gen for Assets generation
 flutter_gen:
-  output: lib/core/gen/
+  output: lib/src/core/gen/
   line_length: 80
 
 flutter_launcher_icons:
