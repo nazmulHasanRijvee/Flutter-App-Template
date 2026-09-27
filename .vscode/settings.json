@@ -2,6 +2,6 @@
     "editor.fontSize": 16.75,
     "files.autoSave": "afterDelay",
     "window.zoomLevel": 0.25,
-    "workbench.colorTheme": "Default Dark+",
-    "workbench.preferredDarkColorTheme": "Default Dark+",
+    "workbench.colorTheme": "Dark+",
+    "workbench.preferredDarkColorTheme": "Dark+",
 }
