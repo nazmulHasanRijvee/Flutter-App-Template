@@ -10,7 +10,7 @@ class AccessTokenInterceptor extends Interceptor {
   final TokenManager tokenManager;
 
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {

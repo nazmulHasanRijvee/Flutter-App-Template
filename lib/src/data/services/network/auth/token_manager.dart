@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_app_template/src/data/services/network/endpoints.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/logger/app_logger.dart';
+import '../endpoints.dart';
 import 'secure_token.dart';
 import 'token_store.dart';
 
@@ -37,7 +37,11 @@ class TokenManager {
       StreamController<bool>.broadcast();
 
   /// Emits `true` when tokens are saved and `false` when the session is cleared.
-  Stream<bool> get sessionStream => _sessionController.stream;
+  /// 
+  /// .distinct() filters the Stream so it only fires when the session status
+  /// (true <-> false) actually changes. This way repeated true -> true emissions
+  /// from silent token refreshes are dropped
+  Stream<bool> get sessionStream => _sessionController.stream.distinct();
 
   late final Future<void> _ready;
   String? _accessToken;
@@ -66,15 +70,19 @@ class TokenManager {
 
     // Complete storage writes before changing memory, so a failed secure
     // storage write cannot leave the in-memory session ahead of storage.
-    await _store.write(TokenKey.access, access);
-    if (refresh != null) {
-      await _store.write(TokenKey.refresh, refresh);
+    try {
+      await _store.write(TokenKey.access, access);
+
+      if (refresh != null) await _store.write(TokenKey.refresh, refresh);
+    } catch (e) {
+      // On Platform Error: Partial write clears everything to avoid mismatched pairs
+      await _store.clear();
+
+      rethrow;
     }
 
     _accessToken = access;
-    if (refresh != null) {
-      _refreshToken = refresh;
-    }
+    if (refresh != null) _refreshToken = refresh;
 
     _sessionController.add(true);
   }
@@ -82,14 +90,15 @@ class TokenManager {
   /// Removes the current session from memory and secure storage.
   Future<void> clearSession() async {
     await _ready;
+    await _store.clear();
     _accessToken = null;
     _refreshToken = null;
-    await _store.clear();
     _sessionController.add(false);
   }
 
-  /// Closes the session broadcast controller.
+  /// Closes the session broadcast controller and _refreshDio's socket pool.
   void dispose() {
+    _refreshDio.close();
     _sessionController.close();
   }
 
@@ -130,7 +139,7 @@ class TokenManager {
 
   /// Only an explicit rejection of the refresh token counts as "session
   /// dead." Timeouts, 5xx, connection errors prove nothing about the token
-  /// — keep the session and let the caller's request fail this once.
+  /// so keep the session and let the caller's request fail this once.
   bool _isAuthDefinitive(Object error) {
     if (error is StateError) return true;
     if (error is DioException && error.type == DioExceptionType.badResponse) {
@@ -149,7 +158,7 @@ class TokenManager {
       throw StateError('No refresh token available');
     }
 
-    final response = await _refreshDio.get<dynamic>(
+    final response = await _refreshDio.post<dynamic>(
       _refreshEndpoint,
       data: {'refreshToken': refreshToken},
     );
@@ -164,14 +173,11 @@ class TokenManager {
       throw StateError('Refresh response missing accessToken');
     }
 
-    await _store.write(.access, newAccess);
-    _accessToken = newAccess;
-
-    // refresh token rotation
     final newRefresh = data['refreshToken'];
     if (newRefresh is String && newRefresh.isNotEmpty) {
-      await _store.write(.refresh, newRefresh);
-      _refreshToken = newRefresh;
+      await saveTokens(access: newAccess, refresh: newRefresh);
+    } else {
+      await saveTokens(access: newAccess);
     }
 
     return newAccess;
