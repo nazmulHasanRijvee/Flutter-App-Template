@@ -73,7 +73,7 @@ class TokenManager {
     try {
       await _store.write(TokenKey.access, access);
 
-      if (refresh != null) await _store.write(TokenKey.refresh, refresh);
+      if (refresh != null && refresh.isNotEmpty) await _store.write(TokenKey.refresh, refresh);
     } catch (e) {
       // On Platform Error: Partial write clears everything to avoid mismatched pairs
       await _store.clear();
@@ -82,7 +82,7 @@ class TokenManager {
     }
 
     _accessToken = access;
-    if (refresh != null) _refreshToken = refresh;
+    if (refresh != null && refresh.isNotEmpty) _refreshToken = refresh;
 
     _sessionController.add(true);
   }
@@ -173,12 +173,12 @@ class TokenManager {
       throw StateError('Refresh response missing accessToken');
     }
 
-    final newRefresh = data['refreshToken'];
-    if (newRefresh is String && newRefresh.isNotEmpty) {
-      await saveTokens(access: newAccess, refresh: newRefresh);
-    } else {
-      await saveTokens(access: newAccess);
-    }
+    // Refresh token rotation: if the backend issues a new refresh token,
+    // saveTokens() persists both. If omitted or null, the existing refresh token
+    // is safely preserved.
+    final rawRefresh = data['refreshToken'];
+    final String? newRefresh = rawRefresh is String ? rawRefresh : null;
+    await saveTokens(access: newAccess, refresh: newRefresh);
 
     return newAccess;
   }
