@@ -112,19 +112,12 @@ class TokenManager {
   Future<void> _runRefresh(Completer<String> completer) async {
     try {
       final newAccess = await _performRefresh();
+
       completer.complete(newAccess);
+
     } catch (e, stackTrace) {
-      if (_isAuthDefinitive(e)) {
-        try {
-          await clearSession();
-        } catch (clearError, clearStack) {
-          AppLogger.error(
-            "TokenManager.clearSession() failed",
-            error: clearError,
-            stackTrace: clearStack,
-          );
-        }
-      }
+      if (_isAuthDefinitive(e)) await clearSession();
+
       completer.completeError(e, stackTrace);
     } finally {
       _inflightRefresh = null;
@@ -135,7 +128,6 @@ class TokenManager {
   /// dead." Timeouts, 5xx, connection errors prove nothing about the token
   /// so keep the session and let the caller's request fail this once.
   bool _isAuthDefinitive(Object error) {
-    if(error is StateError) return true;
     if (error is DioException && error.type == DioExceptionType.badResponse) {
       return switch (error.response?.statusCode) {
         400 || 401 || 403 => true,
