@@ -35,18 +35,19 @@ class TokenManager {
   final Dio _refreshDio;
   final StreamController<bool> _sessionController =
       StreamController<bool>.broadcast();
-
-  /// Emits `true` when tokens are saved and `false` when the session is cleared.
-  /// 
-  /// .distinct() filters the Stream so it only fires when the session status
-  /// (true <-> false) actually changes. This way repeated true -> true emissions
-  /// from silent token refreshes are dropped
-  Stream<bool> get sessionStream => _sessionController.stream.distinct();
-
   late final Future<void> _ready;
   String? _accessToken;
   String? _refreshToken;
   Completer<String>? _inflightRefresh;
+  // 1. Session epoch counter
+  int _sessionEpoch = 0;
+
+  /// Emits `true` when tokens are saved and `false` when the session is cleared.
+  ///
+  /// .distinct() filters the Stream so it only fires when the session status
+  /// (true <-> false) actually changes. This way repeated true -> true emissions
+  /// from silent token refreshes are dropped
+  Stream<bool> get sessionStream => _sessionController.stream.distinct();
 
   /// The token used by the access-token interceptor.
   Future<String?> get accessToken async {
@@ -60,9 +61,8 @@ class TokenManager {
     return _refreshToken;
   }
 
-  /// True once a refresh has definitively failed and cleared the session.
-  /// Sync is fine here, by the time anything calls this, [refresh] has
-  /// already awaited [_ready] internally.
+  /// True if an active session exists (i.e. refresh token is present).
+  /// Returns false once a logout occurs or a refresh definitively fails.
   bool get hasSession => _refreshToken != null;
 
   Future<void> saveTokens({required String access, String? refresh}) async {
@@ -70,16 +70,9 @@ class TokenManager {
 
     // Complete storage writes before changing memory, so a failed secure
     // storage write cannot leave the in-memory session ahead of storage.
-    try {
-      await _store.write(TokenKey.access, access);
+    await _store.write(TokenKey.access, access);
 
-      if (refresh != null && refresh.isNotEmpty) await _store.write(TokenKey.refresh, refresh);
-    } catch (e) {
-      // On Platform Error: Partial write clears everything to avoid mismatched pairs
-      await _store.clear();
-
-      rethrow;
-    }
+    if (refresh != null && refresh.isNotEmpty) await _store.write(TokenKey.refresh, refresh);
 
     _accessToken = access;
     if (refresh != null && refresh.isNotEmpty) _refreshToken = refresh;
@@ -89,6 +82,7 @@ class TokenManager {
 
   /// Removes the current session from memory and secure storage.
   Future<void> clearSession() async {
+    _sessionEpoch++; // Immediately invalidates any in-flight refresh
     await _ready;
     await _store.clear();
     _accessToken = null;
@@ -141,7 +135,6 @@ class TokenManager {
   /// dead." Timeouts, 5xx, connection errors prove nothing about the token
   /// so keep the session and let the caller's request fail this once.
   bool _isAuthDefinitive(Object error) {
-    if (error is StateError) return true;
     if (error is DioException && error.type == DioExceptionType.badResponse) {
       return switch (error.response?.statusCode) {
         400 || 401 || 403 => true,
@@ -153,6 +146,8 @@ class TokenManager {
   }
 
   Future<String> _performRefresh() async {
+    final startEpoch = _sessionEpoch; // 2. Capture epoch before network call
+
     final refreshToken = _refreshToken;
     if (refreshToken == null || refreshToken.isEmpty) {
       throw StateError('No refresh token available');
@@ -163,21 +158,27 @@ class TokenManager {
       data: {'refreshToken': refreshToken},
     );
 
+    // 3. Check if a logout occurred while waiting for the response
+    if (_sessionEpoch != startEpoch) {
+      throw StateError('Session invalidated during refresh');
+    }
+
     final data = response.data;
     if (data is! Map<String, dynamic>) {
-      throw StateError('Refresh response was not a JSON object');
+      throw FormatException('Refresh response was not a JSON object');
     }
 
     final newAccess = data['accessToken'];
     if (newAccess is! String || newAccess.isEmpty) {
-      throw StateError('Refresh response missing accessToken');
+      throw FormatException('Refresh response missing accessToken');
     }
 
     // Refresh token rotation: if the backend issues a new refresh token,
     // saveTokens() persists both. If omitted or null, the existing refresh token
     // is safely preserved.
-    final rawRefresh = data['refreshToken'];
-    final String? newRefresh = rawRefresh is String ? rawRefresh : null;
+    final newRefresh = data['refreshToken'] is String
+        ? data['refreshToken'] as String
+        : null;
     await saveTokens(access: newAccess, refresh: newRefresh);
 
     return newAccess;
