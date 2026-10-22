@@ -135,6 +135,7 @@ class TokenManager {
   /// dead." Timeouts, 5xx, connection errors prove nothing about the token
   /// so keep the session and let the caller's request fail this once.
   bool _isAuthDefinitive(Object error) {
+    if(error is StateError) return true;
     if (error is DioException && error.type == DioExceptionType.badResponse) {
       return switch (error.response?.statusCode) {
         400 || 401 || 403 => true,

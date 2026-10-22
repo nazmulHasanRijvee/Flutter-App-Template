@@ -40,10 +40,6 @@ class TokenRefreshInterceptor extends Interceptor {
         stackTrace: stackTrace,
       );
 
-      // If refresh failed because of connectivity/timeout, bubble up the real network error:
-      if (refreshError is DioException) return handler.next(refreshError);
-
-      // Otherwise fallback to original error
       return handler.next(err);
     }
 
