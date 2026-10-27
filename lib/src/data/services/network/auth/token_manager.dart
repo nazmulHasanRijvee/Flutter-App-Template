@@ -10,8 +10,7 @@ import 'token_store.dart';
 
 /// Owns the application's access and refresh tokens.
 ///
-/// [TokenManager] does not perform authentication or refresh requests. The
-/// refresh interceptor owns that flow; this class only loads, exposes, saves,
+/// [TokenManager] loads, exposes, saves,
 /// updates, and clears tokens for the rest of the app.
 /// Token storage with session-change notifications for Riverpod. It contains
 /// no refresh HTTP logic; the refresh interceptor owns that flow.
