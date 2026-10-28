@@ -31,6 +31,8 @@ class DioClient {
       TokenRefreshInterceptor(
         // onError: refresh token
         tokenManager: tokenManager,
+        baseUrl: Endpoints.base,
+        refreshEndpoint: Endpoints.refreshToken,
         dio: dio,
       ),
       if (kDebugMode) // disable logging only in production (release mode)

@@ -9,7 +9,7 @@ void initializeCrashReporting(CrashReporter reporter) {
 
   /// Handles uncaught asynchronous and platform errors.
   PlatformDispatcher.instance.onError = (error, stack) {
-    reporter.recordError('Uncaught async error', error, stack);
+    reporter.recordError("Uncaught async error", error, stack);
 
     return true; // Mark the error as handled to prevent duplicate logging.
   };

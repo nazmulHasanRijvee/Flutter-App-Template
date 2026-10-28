@@ -1,76 +1,163 @@
-// lib/src/data/network/interceptors/token_refresh_interceptor.dart
 import 'package:dio/dio.dart';
 
-import '../../../../core/logger/app_logger.dart';
 import '../auth/token_manager.dart';
 
-/// Detects 401s, delegates refreshing to [TokenManager] (which is
-/// single-flight — see that class), and replays the failed request once
-/// through the full interceptor chain so [AccessTokenInterceptor] attaches
-/// whatever token is current at replay time.
-///
-/// This class does NOT call the refresh endpoint and does NOT implement its
-/// own concurrency control. Both live in [TokenManager] so they're correct
-/// no matter how many Dio clients need a token.
 class TokenRefreshInterceptor extends Interceptor {
-  TokenRefreshInterceptor({required this.tokenManager, required this.dio});
+  TokenRefreshInterceptor({
+    required this.baseUrl,
+    required this.refreshEndpoint,
+    required this.tokenManager,
+    required this.dio
+    }) : _refreshDio = Dio(
+         BaseOptions(
+           baseUrl: baseUrl,
+           connectTimeout: const Duration(seconds: 15),
+           receiveTimeout: const Duration(seconds: 15),
+         ),
+       );
 
+  final String baseUrl;
+  final String refreshEndpoint;
+  final Dio _refreshDio;
   final TokenManager tokenManager;
   final Dio dio;
 
-  static const _retriedKey = 'auth.retried';
+  bool _isRefreshing = false;
+  final List<_QueuedRequest> _queue = [];
 
   @override
-  Future<void> onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
-    if (!_eligible(err)) return handler.next(err);
-
-    if (await _tokenIsStale(err.requestOptions)) {
-      return _replay(err, handler);
-    }
-
-    try {
-      await tokenManager.refresh();
-    } catch (refreshError, stackTrace) {
-      AppLogger.error(
-        "Token refresh failed",
-        error: refreshError,
-        stackTrace: stackTrace,
-      );
-
-      return handler.next(err);
-    }
-
-    return _replay(err, handler);
-  }
-
-  bool _eligible(DioException err) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final statusCode = err.response?.statusCode;
     final options = err.requestOptions;
-    return err.response?.statusCode == 401 &&
-        options.headers.containsKey('Authorization') &&
-        options.extra[_retriedKey] != true &&
-        options.data is! FormData;
+
+    if (_shouldHandleError(statusCode, options)) {
+      await _handleUnauthorizedError(err, handler);
+      return;
+    }
+
+    handler.next(err);
   }
 
-  Future<bool> _tokenIsStale(RequestOptions options) async {
-    final current = await tokenManager.accessToken;
-    if (current == null || current.isEmpty) return false;
-    return options.headers['Authorization'] != 'Bearer $current';
+  bool _shouldHandleError(int? statusCode, RequestOptions options) {
+    return statusCode == 401 && options.extra['retry'] != true;
   }
 
-  Future<void> _replay(
+  Future<void> _handleUnauthorizedError(
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    final options = err.requestOptions..extra[_retriedKey] = true;
+    if (_isRefreshing) {
+      _queue.add(_QueuedRequest(error: err, handler: handler));
+      return;
+    }
+
+    _isRefreshing = true;
+
     try {
-      handler.resolve(await dio.fetch<dynamic>(options));
-    } on DioException catch (retryError) {
-      handler.next(retryError);
-    } catch (retryError) {
-      handler.next(err.copyWith(error: retryError));
+      final newToken = await _refreshAccessToken();
+
+      await _retryFailedRequest(err.requestOptions, handler, newToken);
+      await _retryQueuedRequests(newToken);
+    } catch (e) {
+      await _handleRefreshFailure(err, handler);
+    } finally {
+      _isRefreshing = false;
+      _queue.clear();
     }
   }
+
+  Future<String> _refreshAccessToken() async {
+    final currentEpoch = tokenManager.sessionEpoch;
+    final refreshToken = await tokenManager.refreshToken;
+    
+    if (refreshToken == null) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        error: 'No refresh token available',
+      );
+    }
+
+    final refreshResp = await _refreshDio.fetch(
+      RequestOptions(
+        baseUrl: baseUrl,
+        path: refreshEndpoint,
+        method: 'GET',
+        headers: {'Authorization': 'Bearer $refreshToken'},
+      ),
+    );
+
+    if (refreshResp.statusCode != 200) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        error:
+            'Refresh token request failed with status: '
+            '${refreshResp.statusCode}',
+      );
+    }
+
+    final newToken = refreshResp.data['data']['accessToken'] as String;
+    final saved = await tokenManager.saveTokens(
+      access: newToken,
+      expectedEpoch: currentEpoch,
+    );
+
+    if (!saved) {
+      throw DioException(
+        requestOptions: RequestOptions(),
+        error: 'Session was invalidated during token refresh',
+      );
+    }
+
+    return newToken;
+  }
+
+  Future<void> _retryFailedRequest(
+    RequestOptions options,
+    ErrorInterceptorHandler handler,
+    String newToken,
+  ) async {
+    options.headers['Authorization'] = 'Bearer $newToken';
+    options.extra['retry'] = true;
+
+    final retryResponse = await dio.fetch(options);
+    handler.resolve(retryResponse);
+  }
+
+  Future<void> _retryQueuedRequests(String newToken) async {
+    for (final queuedRequest in _queue) {
+      try {
+        await _retryFailedRequest(
+          queuedRequest.error.requestOptions,
+          queuedRequest.handler,
+          newToken,
+        );
+      } on DioException catch (e) {
+        queuedRequest.handler.reject(e);
+      }
+    }
+  }
+
+  Future<void> _handleRefreshFailure(
+    DioException originalError,
+    ErrorInterceptorHandler handler,
+  ) async {
+    await tokenManager.clearSession();
+
+    handler.reject(originalError);
+    _rejectQueuedRequests();
+  }
+
+  void _rejectQueuedRequests([DioException? fallbackError]) {
+    for (final queued in _queue) {
+      queued.handler.reject(fallbackError ?? queued.error);
+    }
+  }
+
+}
+
+class _QueuedRequest {
+  const _QueuedRequest({required this.error, required this.handler});
+
+  final DioException error;
+  final ErrorInterceptorHandler handler;
 }
