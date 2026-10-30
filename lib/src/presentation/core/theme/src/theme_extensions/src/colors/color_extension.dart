@@ -2,11 +2,13 @@ part of 'colors.dart';
 
 abstract interface class ColorExtension {
   const ColorExtension({
+    required this.primary,
+    required this.secondary,
+    required this.onPrimary,
+    required this.accent,
+    required this.scaffoldBackground,
     required this.border,
     required this.icon,
-    required this.onPrimary,
-    required this.primary,
-    required this.scaffoldBackground,
     required this.success,
     required this.error,
     required this.warning,
@@ -14,65 +16,66 @@ abstract interface class ColorExtension {
     required this.disabled,
     required this.active,
     required this.inactive,
-    required this.appBar,
-    required this.bottomNavBar,
-    required this.pageView,
     required this.text,
-    required this.secondary,
     required this.textFieldFillColor,
     required this.textFieldBorderColor,
     required this.textFieldFocusBorderColor,
-    required this.accent,
+    required this.appBar,
+    required this.bottomNavBar,
+    required this.pageView,
   });
 
-  final Color border;
-  final Color icon;
-  final Color onPrimary;
   final Color primary;
   final Color secondary;
+  final Color onPrimary;
+  final AccentColors accent;
   final Color scaffoldBackground;
+  final Color border;
+  final Color icon;
+  
   final Color success;
   final Color error;
   final Color warning;
   final Color info;
   final Color disabled;
+
   final Color active;
   final Color inactive;
+
   final Color textFieldFillColor;
   final Color textFieldBorderColor;
   final Color textFieldFocusBorderColor;
+  final TextColors text;
 
   final AppBarColors appBar;
   final BottomNavBarColors bottomNavBar;
   final PageViewColors pageView;
-  final TextColors text;
-  final AccentColors accent;
 }
 
 class LightColorExtension extends ThemeExtension<LightColorExtension>
     implements ColorExtension {
   const LightColorExtension({
-    this.border = _Primitive.neutral20,
-    this.icon = _Primitive.neutral40,
-    this.onPrimary = _Primitive.neutral0,
-    this.primary = _Primitive.brand,
-    this.scaffoldBackground = _Primitive.scaffoldColor,
+    this.primary = _Primitive.brandPrimary,
+    this.secondary = _Primitive.brandSecondary,
+    this.onPrimary = _Primitive.textPrimaryDark,
+    this.accent = const _LightAccentColors(),
+    this.scaffoldBackground = _Primitive.scaffoldLight,
+    this.border = _Primitive.borderLight,
+    this.icon = _Primitive.iconLight,
     this.success = _Primitive.success,
     this.error = _Primitive.error,
     this.warning = _Primitive.warning,
     this.info = _Primitive.info,
-    this.disabled = _Primitive.neutral20,
-    this.active = _Primitive.brand,
-    this.inactive = _Primitive.neutral30,
+    this.disabled = _Primitive.borderLight,
+    this.active = _Primitive.brandPrimary,
+    this.inactive = _Primitive.unselected,
+    this.text = const _LightTextColors(),
+    this.textFieldFillColor = _Primitive.inputFill,
+    this.textFieldBorderColor = _Primitive.inputBorder,
+    this.textFieldFocusBorderColor = _Primitive.inputFocusBorder,
     this.appBar = const _LightAppBarColors(),
     this.bottomNavBar = const _LightBottomNavBarColors(),
     this.pageView = const _LightPageViewColors(),
-    this.text = const _LightTextColors(),
-    this.secondary = _Primitive.brandDeep,
-    this.textFieldFillColor = _Primitive.textFieldFillColor,
-    this.textFieldBorderColor = _Primitive.textFieldBorderColor,
-    this.textFieldFocusBorderColor = _Primitive.textFieldFocusBorderColor,
-    this.accent = const _LightAccentColors(),
   });
 
   @override
@@ -240,27 +243,27 @@ class LightColorExtension extends ThemeExtension<LightColorExtension>
 class DarkColorExtension extends ThemeExtension<DarkColorExtension>
     implements ColorExtension {
   const DarkColorExtension({
-    this.border = _Primitive.neutral30,
-    this.icon = _Primitive.neutral0,
-    this.onPrimary = _Primitive.neutral90,
-    this.primary = _Primitive.brand,
-    this.scaffoldBackground = _Primitive.neutral60,
+    this.primary = _Primitive.brandPrimary,
+    this.secondary = _Primitive.brandSecondary,
+    this.onPrimary = _Primitive.textPrimaryDark,
+    this.accent = const _DarkAccentColors(),
+    this.scaffoldBackground = _Primitive.scaffoldDark,
+    this.border = _Primitive.borderDark,
+    this.icon = _Primitive.iconDark,
     this.success = _Primitive.success,
     this.error = _Primitive.error,
     this.warning = _Primitive.warning,
     this.info = _Primitive.info,
-    this.disabled = _Primitive.neutral20,
-    this.active = _Primitive.brand,
-    this.inactive = _Primitive.neutral30,
+    this.disabled = _Primitive.borderDark,
+    this.active = _Primitive.brandPrimary,
+    this.inactive = _Primitive.unselected,
+    this.text = const _DarkTextColors(),
+    this.textFieldFillColor = _Primitive.surfaceDark,
+    this.textFieldBorderColor = _Primitive.borderDark,
+    this.textFieldFocusBorderColor = _Primitive.inputFocusBorder,
     this.appBar = const _DarkAppBarColors(),
     this.bottomNavBar = const _DarkBottomNavBarColors(),
     this.pageView = const _DarkPageViewColors(),
-    this.text = const _DarkTextColors(),
-    this.secondary = _Primitive.brandDeep,
-    this.textFieldFillColor = _Primitive.textFieldFillColor,
-    this.textFieldBorderColor = _Primitive.textFieldBorderColor,
-    this.textFieldFocusBorderColor = _Primitive.textFieldFocusBorderColor,
-    this.accent = const _DarkAccentColors(),
   });
 
   @override
@@ -399,6 +402,7 @@ class DarkColorExtension extends ThemeExtension<DarkColorExtension>
       info: Color.lerp(info, other.info, t)!,
       disabled: Color.lerp(disabled, other.disabled, t)!,
       active: Color.lerp(active, other.active, t)!,
+      inactive: Color.lerp(inactive, other.inactive, t)!,
       // Complex objects are harder to lerp, so we'll just use whichever is
       // appropriate based on animation progress
       appBar: t < 0.5 ? appBar : other.appBar,

@@ -11,18 +11,18 @@ class _LightBottomNavBarColors extends BottomNavBarColors {
   const _LightBottomNavBarColors();
 
   @override
-  Color get selectedItem => _Primitive.brand;
+  Color get selectedItem => _Primitive.brandPrimary;
 
   @override
-  Color get unselectedItem => _Primitive.neutral20;
+  Color get unselectedItem => _Primitive.unselected;
 }
 
 class _DarkBottomNavBarColors extends BottomNavBarColors {
   const _DarkBottomNavBarColors();
 
   @override
-  Color get selectedItem => _Primitive.brand;
+  Color get selectedItem => _Primitive.brandPrimary;
 
   @override
-  Color get unselectedItem => _Primitive.neutral20;
+  Color get unselectedItem => _Primitive.unselected;
 }

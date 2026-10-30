@@ -18,7 +18,7 @@ class _LightAccentColors extends AccentColors {
   Color get purple => _Primitive.accentPurple;
 
   @override
-  Color get yellow => _Primitive.accentYellow;
+  Color get yellow => _Primitive.ratingAmber;
 }
 
 class _DarkAccentColors extends AccentColors {
@@ -31,5 +31,5 @@ class _DarkAccentColors extends AccentColors {
   Color get purple => _Primitive.accentPurple;
 
   @override
-  Color get yellow => _Primitive.accentYellow;
+  Color get yellow => _Primitive.ratingAmber;
 }

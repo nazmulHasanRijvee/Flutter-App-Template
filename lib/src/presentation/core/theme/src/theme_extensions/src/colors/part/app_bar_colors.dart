@@ -13,30 +13,30 @@ class _LightAppBarColors extends AppBarColors {
   const _LightAppBarColors();
 
   @override
-  Color get background => _Primitive.neutral10;
+  Color get background => _Primitive.inputFill;
 
   @override
-  Color get icon => _Primitive.neutral60;
+  Color get icon => _Primitive.iconLight;
 
   @override
-  Color get surfaceTint => _Primitive.neutral10;
+  Color get surfaceTint => _Primitive.inputFill;
 
   @override
-  Color get title => _Primitive.neutral50;
+  Color get title => _Primitive.textPrimaryLight;
 }
 
 class _DarkAppBarColors extends AppBarColors {
   const _DarkAppBarColors();
 
   @override
-  Color get background => _Primitive.neutral60;
+  Color get background => _Primitive.scaffoldDark;
 
   @override
-  Color get icon => _Primitive.neutral0;
+  Color get icon => _Primitive.iconDark;
 
   @override
-  Color get surfaceTint => _Primitive.neutral60;
+  Color get surfaceTint => _Primitive.scaffoldDark;
 
   @override
-  Color get title => _Primitive.neutral0;
+  Color get title => _Primitive.textPrimaryDark;
 }

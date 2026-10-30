@@ -1,5 +1,5 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_ui/material_ui.dart';
 
 class TextStyleExtension extends ThemeExtension<TextStyleExtension> {
   const TextStyleExtension();
@@ -89,6 +89,13 @@ class TextStyleExtension extends ThemeExtension<TextStyleExtension> {
   ThemeExtension<TextStyleExtension> copyWith() => const TextStyleExtension();
 
   @override
-  ThemeExtension<TextStyleExtension> lerp(other, t) =>
-      const TextStyleExtension();
+  ThemeExtension<TextStyleExtension> lerp(
+    covariant ThemeExtension<TextStyleExtension>? other,
+    double t,
+  ) {
+    if (other is! TextStyleExtension) {
+      return this;
+    }
+    return t < 0.5 ? this : other;
+  }
 }
