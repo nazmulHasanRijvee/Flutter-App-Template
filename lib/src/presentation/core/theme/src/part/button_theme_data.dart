@@ -16,7 +16,7 @@ class _FilledButtonLightThemeData with ThemeExtensions {
           EdgeInsets.symmetric(horizontal: dimensions.spacing.xl),
         ),
         minimumSize: WidgetStateProperty.all(
-          Size(double.infinity, dimensions.spacing.xxl),
+          Size(dimensions.sizes.xl, dimensions.sizes.md2),
         ),
         textStyle: WidgetStateProperty.all(
           const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -43,7 +43,7 @@ class _FilledButtonDarkThemeData with ThemeExtensions {
           EdgeInsets.symmetric(horizontal: dimensions.spacing.xl),
         ),
         minimumSize: WidgetStateProperty.all(
-          Size(double.infinity, dimensions.spacing.xxl),
+          Size(dimensions.sizes.xl, dimensions.sizes.md2),
         ),
         textStyle: WidgetStateProperty.all(
           const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -74,7 +74,7 @@ class _ElevatedButtonLightThemeData with ThemeExtensions {
           EdgeInsets.symmetric(horizontal: dimensions.spacing.xl),
         ),
         minimumSize: WidgetStateProperty.all(
-          Size(double.infinity, dimensions.spacing.xxl),
+          Size(dimensions.sizes.xl, dimensions.sizes.md2),
         ),
         textStyle: WidgetStateProperty.all(
           const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -102,7 +102,7 @@ class _ElevatedButtonDarkThemeData with ThemeExtensions {
           EdgeInsets.symmetric(horizontal: dimensions.spacing.xl),
         ),
         minimumSize: WidgetStateProperty.all(
-          Size(double.infinity, dimensions.spacing.xxl),
+          Size(dimensions.sizes.xl, dimensions.sizes.md2),
         ),
         textStyle: WidgetStateProperty.all(
           const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
